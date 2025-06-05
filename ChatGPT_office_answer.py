@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
 
 # =====🔐 密碼驗證功能區塊 =====
-# 可設定多組帳號密碼
-VALID_PASSWORDS = {"ahong": "handsome", "abing": "asshole"}
+# 從 Streamlit Cloud 的 secrets 中讀取帳號密碼設定
+VALID_PASSWORDS = st.secrets["passwords"]  # 讀取 TOML 格式中的 [passwords]
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
@@ -26,8 +26,7 @@ if not st.session_state.authenticated:
 # =====✅ 通過驗證，進入主頁 =====
 
 # 載入 API 金鑰
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
 
 st.set_page_config(page_title="問答助手", page_icon="💬")
