@@ -153,19 +153,16 @@ with st.container():
 
 # ========= 對話輸入表單 =========
 with st.form("chat_form", clear_on_submit=True):
-    cols = st.columns([6, 2, 2])
+    cols = st.columns([6, 2])
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
         uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=None)
     with cols[1]:
-        st.markdown(" ")  # 垂直空間
         submitted = st.form_submit_button("送出")
-    with cols[2]:
-        st.markdown(" ")
-        clear_clicked = st.form_submit_button("清除紀錄")
+
+clear_clicked = st.button("清除紀錄")
 
 if submitted:
-    # 先處理文字問題
     if user_input:
         answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
         st.session_state[chat_key].append({
@@ -175,13 +172,9 @@ if submitted:
         })
         st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
 
-    # 如果有上傳檔案，可以在這裡處理
     if uploaded_file:
         st.success(f"已上傳檔案：{uploaded_file.name}")
-        # 你可以把檔案存起來或讀取內容，這邊只是示範
-        # 例如，儲存檔案：
-        # with open(f"uploads/{uploaded_file.name}", "wb") as f:
-        #     f.write(uploaded_file.getbuffer())
+        # 這裡可以加你自己的檔案處理邏輯
 
     st.rerun()
 
