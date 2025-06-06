@@ -147,10 +147,10 @@ else:
     with st.container():
         for chat in st.session_state.chat_history:
             st.markdown(f'''
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 40px;">
                     <div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%;">{chat["question"]}</div>
-                    <div style="background:#F1F0F0; padding:10px; border-radius:15px; max-width:75%; margin-left:auto; margin-top:8px;">{chat["answer"]}</div>
-                    <div style="font-size:13px; color:#666; text-align:right; margin-top:5px;">{chat["meta"]}</div>
+                    <div style="background:#F1F0F0; padding:10px; border-radius:15px; max-width:75%; margin-left:auto; margin-top:15px;">{chat["answer"]}</div>
+                    <div style="font-size:13px; color:#666; text-align:right; margin-top:10px;">{chat["meta"]}</div>
                 </div>
             ''', unsafe_allow_html=True)
 
