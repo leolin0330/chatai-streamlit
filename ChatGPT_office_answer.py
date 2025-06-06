@@ -1,11 +1,8 @@
 import streamlit as st
-import os
-from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
 
 # =====🔐 密碼驗證功能區塊 =====
-# 從 Streamlit Cloud 的 secrets 中讀取帳號密碼設定
-VALID_PASSWORDS = st.secrets["passwords"]  # 讀取 TOML 格式中的 [passwords]
+VALID_PASSWORDS = st.secrets["passwords"]
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
@@ -21,17 +18,14 @@ if not st.session_state.authenticated:
             st.rerun()
         else:
             st.error("❌ 帳號或密碼錯誤")
-    st.stop()  # 阻止進入主程式
+    st.stop()
 
 # =====✅ 通過驗證，進入主頁 =====
-
-# 載入 API 金鑰
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
 
 st.set_page_config(page_title="問答助手", page_icon="💬")
 
-# 初始化聊天紀錄
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "confirm_clear" not in st.session_state:
@@ -57,7 +51,7 @@ def ask_openai(prompt):
     except OpenAIError as e:
         return f"❌ API 錯誤：{str(e)}", 0, 0.0, 0.0
 
-# CSS 樣式
+# CSS
 st.markdown("""
     <style>
     .chat-container {
@@ -93,10 +87,38 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 頁面標題
 st.title("💬 問答助手")
 
-# 清除確認提示
+# ✅ 聊天紀錄區
+st.markdown("## 📝 對話紀錄")
+with st.container():
+    for chat in st.session_state.chat_history:
+        st.markdown(f'<div class="chat-bubble-user">{chat["question"]}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="chat-bubble-bot">{chat["answer"]}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="chat-meta">{chat["meta"]}</div>', unsafe_allow_html=True)
+
+# ✅ 輸入表單（送出按鈕）單獨放
+with st.form("chat_form", clear_on_submit=True):
+    cols = st.columns([7, 2])
+    with cols[0]:
+        user_input = st.text_input("💡 請輸入你的問題：")
+    with cols[1]:
+        submitted = st.form_submit_button("送出")
+
+if submitted and user_input:
+    answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
+    st.session_state.chat_history.append({
+        "question": user_input,
+        "answer": answer,
+        "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
+    })
+    st.rerun()
+
+# ✅ 清除按鈕獨立放，才不會被表單 reset 狀態
+if st.button("🗑️ 清除"):
+    st.session_state.confirm_clear = True
+
+# ✅ 清除確認區塊
 if st.session_state.confirm_clear:
     st.warning("⚠️ 你確定要清除所有對話紀錄嗎？這個動作無法還原！")
     c1, c2 = st.columns(2)
@@ -108,33 +130,3 @@ if st.session_state.confirm_clear:
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
-
-# 聊天紀錄區
-st.markdown("## 📝 對話紀錄")
-with st.container():
-    for chat in st.session_state.chat_history:
-        st.markdown(f'<div class="chat-bubble-user">{chat["question"]}</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="chat-bubble-bot">{chat["answer"]}</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="chat-meta">{chat["meta"]}</div>', unsafe_allow_html=True)
-
-# 輸入表單 + 送出/清除按鈕並排
-with st.form("chat_form", clear_on_submit=True):
-    cols = st.columns([7, 1.5, 1.5])
-    with cols[0]:
-        user_input = st.text_input("💡 請輸入你的問題：")
-    with cols[1]:
-        submitted = st.form_submit_button("送出")
-    with cols[2]:
-        clear_clicked = st.form_submit_button("🗑️ 清除")
-
-    if submitted and user_input:
-        answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
-        st.session_state.chat_history.append({
-            "question": user_input,
-            "answer": answer,
-            "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
-        })
-        st.rerun()
-
-    if clear_clicked:
-        st.session_state.confirm_clear = True
