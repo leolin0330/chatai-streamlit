@@ -51,7 +51,7 @@ def login():
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.success("登入成功")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("帳號或密碼錯誤")
 
@@ -73,7 +73,8 @@ st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}�
 if st.button("登出"):
     st.session_state.authenticated = False
     st.session_state.username = None
-    st.experimental_rerun()
+    st.rerun()
+    st.stop()
 
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
