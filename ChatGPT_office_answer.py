@@ -161,7 +161,7 @@ with st.form("chat_form", clear_on_submit=True):
         submitted = st.form_submit_button("送出")
     with cols[2]:
         st.markdown(" ")
-        clear_clicked = st.form_submit_button("🗑️ 清除")
+        clear_clicked = st.form_submit_button("清除紀錄")
 
 if submitted and user_input:
     answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
