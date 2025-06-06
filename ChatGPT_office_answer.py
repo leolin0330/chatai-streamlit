@@ -62,7 +62,8 @@ user_limits = {
 user_limit = user_limits.get(username)
 
 if username == "ahong":
-    st.info("🛠️ 你是管理員，無金額限制")
+    # st.info("🛠️ 你是管理員，無金額限制")
+    pass
 elif user_limit is not None:
     remaining = round(user_limit - st.session_state.total_usd_cost, 4)
     st.warning(f"⚠️ 你目前已使用 ${st.session_state.total_usd_cost}，剩餘：${remaining} 美元額度")
