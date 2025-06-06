@@ -80,17 +80,22 @@ st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}�
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
 
-DAILY_LIMITS = {
-    "ahong": None,
-    "abing": 0.05,
-    "user": 0.05,
-}
-user_limit = DAILY_LIMITS.get(username, 0.05)
+# --- 修改的身分與限額邏輯 ---
+if username == "ahong":
+    user_type = "admin"
+    user_limit = None
+elif username == "abing":
+    user_type = "special"
+    user_limit = 0.05
+else:
+    user_type = "user"
+    user_limit = 0.05
+
 today = str(date.today())
 today_used = st.session_state.daily_usage.get(today, 0.0)
 remaining = round(user_limit - today_used, 4) if user_limit is not None else None
 
-if username == "ahong":
+if user_type == "admin":
     st.info("🛠️ 你是管理員，無金額限制")
 else:
     st.warning(f"⚠️ 今日已使用：${round(today_used, 4)}，剩餘：${remaining} 美元")
@@ -230,10 +235,6 @@ if submitted:
         st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
         st.rerun()
 
-
-
-
-
 # ========= 清除功能 =========
 if clear_clicked:
     st.session_state.confirm_clear = True
@@ -254,3 +255,9 @@ if st.session_state.confirm_clear:
 with st.expander("📊 每日使用紀錄"):
     for date_str, cost in sorted(st.session_state.daily_usage.items()):
         st.write(f"{date_str}：${round(cost, 4)}")
+
+
+# git add chat_ai.py — 把你本地改過的檔案都加入暫存區
+# git commit -m "描述你改了什麼" — 提交改動，做好版本紀錄
+# git pull origin main — 把遠端最新更新拉下來，合併到你本地（避免衝突）
+# git push origin main — 把本地最新版本推送回遠端 GitHub
