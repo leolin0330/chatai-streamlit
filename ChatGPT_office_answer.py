@@ -5,14 +5,19 @@ from datetime import date
 # 頁面設定：一定要在其他 Streamlit 命令前呼叫
 st.set_page_config(page_title="問答助手", page_icon="💬")
 
+# ===== 強制初始化所有 session_state key =====
+for key, default in {
+    "authenticated": False,
+    "username": None,
+    "chat_history": [],
+    "confirm_clear": False,
+    "daily_usage": {}
+}.items():
+    if key not in st.session_state:
+        st.session_state[key] = default
+
 # =====🔐 密碼驗證功能區塊 =====
 VALID_PASSWORDS = st.secrets["passwords"]
-
-# 初始化 session_state
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-if "username" not in st.session_state:
-    st.session_state.username = None
 
 def login():
     st.title("登入頁面")
@@ -22,25 +27,34 @@ def login():
         submitted = st.form_submit_button("登入")
 
         if submitted:
-            # 這裡改成用你的密碼驗證邏輯，示範用固定帳密
-            if username == "user" and password == "pass":
+            # 用 secrets 裡的密碼來驗證
+            if username in VALID_PASSWORDS and password == VALID_PASSWORDS[username]:
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.success("登入成功")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("帳號或密碼錯誤")
 
-if not st.session_state.authenticated:
+# 防呆：若沒登入或 username 為 None 就跳登入
+if not st.session_state.authenticated or not st.session_state.username:
     login()
 else:
     username = st.session_state.username
+
+    # 印出除錯資訊（可開可關）
+    st.write("Session state keys:", list(st.session_state.keys()))
+    st.write("Username:", username)
+
     st.title("💬 問答助手")
     st.write(f"歡迎 {username}！")
 
     # =====✅ 通過驗證，進入主頁 =====
     api_key = st.secrets["OPENAI_API_KEY"]
     client = OpenAI(api_key=api_key)
+
+    # （後面你的聊天功能跟每日限制代碼繼續...）
+
 
     # 初始化聊天歷史與每日使用紀錄
     if "chat_history" not in st.session_state:
@@ -172,7 +186,7 @@ else:
             if st.button("✅ 是的，清除"):
                 st.session_state.chat_history = []
                 st.session_state.confirm_clear = False
-                st.experimental_rerun()
+                st.rerun()
         with c2:
             if st.button("❌ 取消"):
                 st.session_state.confirm_clear = False
