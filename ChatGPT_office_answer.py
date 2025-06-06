@@ -154,24 +154,26 @@ with st.container():
             ''', unsafe_allow_html=True)
 
 # ========= 對話輸入表單 =========
-
 with st.form("chat_form", clear_on_submit=True):
     cols = st.columns([6, 2])
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
-        uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=None)
+        uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=["txt", "pdf", "docx"])
     with cols[1]:
         submitted = st.form_submit_button("送出")
 
 clear_clicked = st.button("清除紀錄")
 
-if submitted:
-    # 使用者輸入內容（先去除前後空白）
-    user_input = user_input.strip()
+# ==== 初始化記憶檔案內容用的 session_state ====
+if "uploaded_file_text" not in st.session_state:
+    st.session_state.uploaded_file_text = None
+    st.session_state.uploaded_file_name = None
 
-    # === 情況一：有上傳檔案 ===
+if submitted:
+    full_prompt = user_input.strip()
+
+    # 如果有上傳新檔案，就重新解析並記下內容
     if uploaded_file:
-        st.success(f"已上傳檔案：{uploaded_file.name}")
         file_text = ""
 
         if uploaded_file.name.endswith(".txt"):
@@ -190,29 +192,30 @@ if submitted:
             file_text = None
 
         if file_text:
-            prompt_with_file = f"以下是使用者的檔案內容：\n\n{file_text}\n\n問題：{user_input or '請幫我分析上傳的內容'}"
-            answer, tokens, usd_cost, twd_cost = ask_openai(prompt_with_file)
-            st.session_state[chat_key].append({
-                "question": f"{user_input or '（未輸入問題）'}\n（來自上傳檔案：{uploaded_file.name}）",
-                "answer": answer,
-                "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
-            })
-            st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
-            st.rerun()
+            # 記住檔案內容和名稱
+            st.session_state.uploaded_file_text = file_text
+            st.session_state.uploaded_file_name = uploaded_file.name
+            st.info("📖 檔案內容已成功讀取，現在可以根據這份文件問問題")
 
-    # === 情況二：只有純文字輸入（無附檔案） ===
-    elif user_input:
-        answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
+    # 判斷是要送出單純問題，還是附加檔案的 prompt
+    if user_input:
+        if st.session_state.uploaded_file_text:
+            prompt_with_file = f"以下是使用者的檔案內容：\n\n{st.session_state.uploaded_file_text}\n\n問題：{user_input}"
+            question_desc = f"{user_input}\n（來自上傳檔案：{st.session_state.uploaded_file_name}）"
+        else:
+            prompt_with_file = user_input
+            question_desc = user_input
+
+        answer, tokens, usd_cost, twd_cost = ask_openai(prompt_with_file)
+
         st.session_state[chat_key].append({
-            "question": user_input,
+            "question": question_desc,
             "answer": answer,
             "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
         })
         st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
         st.rerun()
 
-    else:
-        st.warning("⚠️ 請輸入問題或上傳檔案")
 
 
 
