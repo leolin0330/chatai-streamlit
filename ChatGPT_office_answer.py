@@ -65,7 +65,7 @@ username = st.session_state.username
 if st.button("登出"):
     st.session_state.authenticated = False
     st.session_state.username = None
-    st.experimental_rerun()
+    st.rerun()
 
 st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
 
