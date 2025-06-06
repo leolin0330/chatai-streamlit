@@ -6,8 +6,6 @@ VALID_PASSWORDS = st.secrets["passwords"]
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
-if "username" not in st.session_state:
-    st.session_state.username = ""
 
 if not st.session_state.authenticated:
     st.title("🔐 請先登入")
@@ -17,13 +15,13 @@ if not st.session_state.authenticated:
         if username in VALID_PASSWORDS and password == VALID_PASSWORDS[username]:
             st.session_state.authenticated = True
             st.session_state.username = username
-            st.success("✅ 登入成功！")
             st.rerun()
         else:
             st.error("❌ 帳號或密碼錯誤")
     st.stop()
 
 # =====✅ 通過驗證，進入主頁 =====
+username = st.session_state.username
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
 
@@ -36,9 +34,20 @@ if "confirm_clear" not in st.session_state:
 if "total_usd_cost" not in st.session_state:
     st.session_state.total_usd_cost = 0.0
 
-username = st.session_state.username
-user_limits = st.secrets.get("user_limits", {})
-user_limit = user_limits.get(username, None)
+# ✅ 使用者金額上限設定
+user_limits = {
+    "abing": 1.0  # 最高可用 1 美元
+}
+user_limit = user_limits.get(username)
+
+if username == "ahong":
+    st.info("🛠️ 你是管理員，無金額限制")
+elif user_limit is not None:
+    remaining = round(user_limit - st.session_state.total_usd_cost, 4)
+    st.warning(f"⚠️ 你目前已使用 ${st.session_state.total_usd_cost}，剩餘：${remaining} 美元額度")
+    if remaining <= 0:
+        st.error(f"🚫 你已達到金額上限 (${user_limit})，無法繼續使用。請聯絡管理員。")
+        st.stop()
 
 # 回答函式
 def ask_openai(prompt):
@@ -98,16 +107,6 @@ st.markdown("""
 
 st.title("💬 問答助手")
 
-# ✅ 提醒使用者目前金額
-if username == "ahong":
-    st.info("🛠️ 你是管理員，無金額限制")
-elif user_limit is not None:
-    remaining = round(user_limit - st.session_state.total_usd_cost, 4)
-    st.warning(f"⚠️ 你目前已使用 ${st.session_state.total_usd_cost}，剩餘：${remaining} 美元額度")
-    if remaining <= 0:
-        st.error(f"🚫 你已達到金額上限 (${user_limit})，無法繼續使用。請聯絡管理員。")
-        st.stop()
-
 # ✅ 聊天紀錄區
 st.markdown("### 📝 對話紀錄")
 with st.container():
@@ -132,7 +131,17 @@ with st.form("chat_form", clear_on_submit=True):
 
 if submitted and user_input:
     answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
-    st.session_state.total_usd_cost += usd_cost  # 累積金額
+
+    # 更新總花費
+    st.session_state.total_usd_cost += usd_cost
+
+    # 金額限制再次檢查（避免剛好超過）
+    if username != "ahong" and user_limit is not None:
+        if st.session_state.total_usd_cost > user_limit:
+            st.error(f"🚫 此次使用後超出額度，將不記錄此次訊息。")
+            st.session_state.total_usd_cost -= usd_cost
+            st.stop()
+
     st.session_state.chat_history.append({
         "question": user_input,
         "answer": answer,
@@ -154,10 +163,3 @@ if st.session_state.confirm_clear:
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
-
-
-# git add ChatGPT_office_answer.py
-# git commit -m "更新 ChatGPT_office_answer 的功能"
-# git push origin main
-
-
