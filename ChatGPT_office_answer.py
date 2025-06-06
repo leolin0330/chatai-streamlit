@@ -205,7 +205,7 @@ if submitted and user_input:
     st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
     save_daily_usage(st.session_state.daily_usage)
 
-    st.experimental_rerun()
+    st.rerun()
 
 # ========= 清除功能 =========
 if clear_clicked:
