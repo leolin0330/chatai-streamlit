@@ -61,13 +61,19 @@ if not st.session_state.authenticated or not st.session_state.username:
 
 username = st.session_state.username
 
+# # 登出
+# if st.button("登出"):
+#     st.session_state.authenticated = False
+#     st.session_state.username = None
+#     st.experimental_rerun()
+
+st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
+
 # 登出
 if st.button("登出"):
     st.session_state.authenticated = False
     st.session_state.username = None
     st.experimental_rerun()
-
-st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
 
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
