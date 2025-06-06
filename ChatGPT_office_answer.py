@@ -66,7 +66,7 @@ if username == "ahong":
     pass
 elif user_limit is not None:
     remaining = round(user_limit - st.session_state.total_usd_cost, 4)
-    st.warning(f"⚠️ 你目前已使用 ${st.session_state.total_usd_cost}，剩餘：${remaining} 美元額度")
+    # st.warning(f"⚠️ 你目前已使用 ${st.session_state.total_usd_cost}，剩餘：${remaining} 美元額度")
     if remaining <= 0:
         st.error(f"🚫 你已達到金額上限 (${user_limit})，無法繼續使用。請聯絡管理員。")
         st.stop()
