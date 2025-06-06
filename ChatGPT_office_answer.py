@@ -1,6 +1,6 @@
 import streamlit as st
 from openai import OpenAI, OpenAIError
-import datetime
+from datetime import date
 
 # =====🔐 密碼驗證功能區塊 =====
 VALID_PASSWORDS = st.secrets["passwords"]
@@ -15,61 +15,36 @@ if not st.session_state.authenticated:
     if st.button("登入"):
         if username in VALID_PASSWORDS and password == VALID_PASSWORDS[username]:
             st.session_state.authenticated = True
-            st.session_state.username = username
-            st.rerun()
+            st.session_state.username = username  # 儲存登入帳號
+            st.success("✅ 登入成功！")
+            st.experimental_rerun()
         else:
             st.error("❌ 帳號或密碼錯誤")
     st.stop()
 
 # =====✅ 通過驗證，進入主頁 =====
-username = st.session_state.username
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
 
 st.set_page_config(page_title="問答助手", page_icon="💬")
 
+# 初始化必要的 session_state
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "confirm_clear" not in st.session_state:
     st.session_state.confirm_clear = False
+if "daily_usage" not in st.session_state:
+    st.session_state.daily_usage = {}
 if "total_usd_cost" not in st.session_state:
     st.session_state.total_usd_cost = 0.0
 
-# ✅ 建立每天的使用記錄（如果尚未建立）
-today_str = datetime.date.today().isoformat()  # e.g., '2025-06-06'
-if "daily_usage" not in st.session_state:
-    st.session_state.daily_usage = {}
-if today_str not in st.session_state.daily_usage:
-    st.session_state.daily_usage[today_str] = 0.0
-
-# ✅ 每日限額設定
-daily_limit = 0.05 if username == "abing" else None
-
-if username == "ahong":
-    st.info("🛠️ 你是管理員，無金額限制")
-elif daily_limit is not None:
-    used_today = st.session_state.daily_usage[today_str]
-    remaining_today = round(daily_limit - used_today, 4)
-    st.warning(f"⚠️ 今日已使用 ${used_today}，剩餘：${remaining_today} 美元")
-    if remaining_today <= 0:
-        st.error(f"🚫 今天已達金額上限 (${daily_limit})，請明天再來！")
-        st.stop()
-
-# ✅ 使用者金額上限設定
-user_limits = {
-    "abing": 0.05  # 最高可用 1 美元
+# 每日使用金額限制（可以改成依照帳號不同調整）
+DAILY_LIMITS = {
+    "ahong": None,  # 管理員無限制
+    "abing": 0.05,  # 使用者每日限制0.05美元
 }
-user_limit = user_limits.get(username)
-
-if username == "ahong":
-    # st.info("🛠️ 你是管理員，無金額限制")
-    pass
-elif user_limit is not None:
-    remaining = round(user_limit - st.session_state.total_usd_cost, 4)
-    # st.warning(f"⚠️ 你目前已使用 ${st.session_state.total_usd_cost}，剩餘：${remaining} 美元額度")
-    if remaining <= 0:
-        st.error(f"🚫 你已達到金額上限 (${user_limit})，無法繼續使用。請聯絡管理員。")
-        st.stop()
+username = st.session_state.username
+user_limit = DAILY_LIMITS.get(username, 0.05)  # 預設0.05限制
 
 # 回答函式
 def ask_openai(prompt):
@@ -91,7 +66,7 @@ def ask_openai(prompt):
     except OpenAIError as e:
         return f"❌ API 錯誤：{str(e)}", 0, 0.0, 0.0
 
-# CSS
+# CSS美化
 st.markdown("""
     <style>
     .chat-container {
@@ -129,7 +104,20 @@ st.markdown("""
 
 st.title("💬 問答助手")
 
-# ✅ 聊天紀錄區
+# 金額限制檢查（非管理員才執行）
+if username == "ahong":
+    st.info("🛠️ 你是管理員，無金額限制")
+else:
+    today = str(date.today())
+    today_used = st.session_state.daily_usage.get(today, 0.0)
+    remaining = round(user_limit - today_used, 4)
+    st.warning(f"⚠️ 今日已使用：${round(today_used,4)}，剩餘：${remaining} 美元")
+
+    if remaining <= 0:
+        st.error(f"🚫 你今天已達到金額上限 (${user_limit})，無法繼續使用。請聯絡管理員。")
+        st.stop()
+
+# 聊天紀錄區
 st.markdown("### 📝 對話紀錄")
 with st.container():
     for chat in st.session_state.chat_history:
@@ -137,7 +125,7 @@ with st.container():
         st.markdown(f'<div class="chat-bubble-bot">{chat["answer"]}</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="chat-meta">{chat["meta"]}</div>', unsafe_allow_html=True)
 
-# ✅ 輸入表單（送出按鈕）單獨放
+# 輸入表單（送出、清除）
 with st.form("chat_form", clear_on_submit=True):
     cols = st.columns([6, 2, 2])
     with cols[0]:
@@ -151,33 +139,25 @@ with st.form("chat_form", clear_on_submit=True):
         st.write("")
         clear_clicked = st.form_submit_button("🗑️ 清除")
 
+# 送出處理
 if submitted and user_input:
     answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
-
-    # 更新總花費
-    st.session_state.total_usd_cost += usd_cost
-
-    # 若超過當日限額，則回滾
-    if daily_limit is not None and st.session_state.daily_usage[today_str] > daily_limit:
-        st.session_state.total_usd_cost -= usd_cost
-        st.session_state.daily_usage[today_str] -= usd_cost
-        st.error("🚫 此次使用將導致超出每日限額，訊息未儲存。")
-        st.stop()
-
-    # 金額限制再次檢查（避免剛好超過）
-    if username != "ahong" and user_limit is not None:
-        if st.session_state.total_usd_cost > user_limit:
-            st.error(f"🚫 此次使用後超出額度，將不記錄此次訊息。")
-            st.session_state.total_usd_cost -= usd_cost
-            st.stop()
-
     st.session_state.chat_history.append({
         "question": user_input,
         "answer": answer,
         "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
     })
-    st.rerun()
 
+    # 累計今日花費
+    today = str(date.today())
+    if today not in st.session_state.daily_usage:
+        st.session_state.daily_usage[today] = 0.0
+    st.session_state.daily_usage[today] += usd_cost
+    st.session_state.total_usd_cost += usd_cost
+
+    st.experimental_rerun()
+
+# 清除對話確認
 if clear_clicked:
     st.session_state.confirm_clear = True
 
@@ -188,11 +168,12 @@ if st.session_state.confirm_clear:
         if st.button("✅ 是的，清除"):
             st.session_state.chat_history = []
             st.session_state.confirm_clear = False
-            st.rerun()
+            st.experimental_rerun()
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
-# 每日使用紀錄
+
+# 顯示每日使用紀錄
 with st.expander("📊 每日使用紀錄"):
     for date_str, cost in sorted(st.session_state.daily_usage.items()):
         st.write(f"{date_str}：${round(cost, 4)}")
