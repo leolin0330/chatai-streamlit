@@ -135,6 +135,8 @@ with st.form("chat_form", clear_on_submit=True):
         user_input = st.text_input("💡 請輸入你的問題：")
     with cols[1]:
         submitted = st.form_submit_button("送出")
+    with cols[2]:
+        clear_clicked = st.button("🗑️ 清除")
 
     if submitted and user_input:
         answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
@@ -147,21 +149,18 @@ with st.form("chat_form", clear_on_submit=True):
         save_daily_usage(st.session_state.daily_usage)
         st.rerun()  # 如果 st.rerun() 报错，可以换成这个
 
-if st.button("🗑️ 清除所有對話紀錄"):
-    st.session_state.confirm_clear = True
-
-if st.session_state.confirm_clear:
-    st.warning("⚠️ 你確定要清除所有對話紀錄嗎？這個動作無法還原！")
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("✅ 是的，清除"):
-            st.session_state.chat_history = []
-            st.session_state.confirm_clear = False
-            st.rerun()
-    with c2:
-        if st.button("❌ 取消"):
-            st.session_state.confirm_clear = False
-            st.rerun()
+    if st.session_state.confirm_clear:
+        st.warning("⚠️ 你確定要清除所有對話紀錄嗎？這個動作無法還原！")
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("✅ 是的，清除"):
+                st.session_state.chat_history = []
+                st.session_state.confirm_clear = False
+                st.rerun()
+        with c2:
+            if st.button("❌ 取消"):
+                st.session_state.confirm_clear = False
+                st.rerun()
 
 
 with st.expander("📊 每日使用紀錄"):
