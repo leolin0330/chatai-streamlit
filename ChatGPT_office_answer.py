@@ -24,10 +24,10 @@ def save_daily_usage(data):
 
 st.set_page_config(page_title="問答助手", page_icon="💬")
 
+# 初始化 session_state（登入前）
 for key, default in {
     "authenticated": False,
     "username": None,
-    "chat_history": [],
     "confirm_clear": False,
     "daily_usage": {}
 }.items():
@@ -60,6 +60,11 @@ if not st.session_state.authenticated or not st.session_state.username:
     st.stop()
 
 username = st.session_state.username
+
+# 初始化個別用戶的 chat_history
+chat_key = f"chat_history_{username}"
+if chat_key not in st.session_state:
+    st.session_state[chat_key] = []
 
 # 登出
 if st.button("登出"):
@@ -122,9 +127,9 @@ div[data-testid="stForm"] { margin-top: 100px; }
 
 st.markdown("### 📝 對話紀錄")
 
-# ========= 對話紀錄 =========
+# ========= 顯示對話紀錄 =========
 with st.container():
-    for chat in st.session_state.chat_history:
+    for chat in st.session_state[chat_key]:
         st.markdown(f'''
             <div style="font-size:13px; color:#555; margin-left:8px; margin-bottom:3px;">
                 <b>{'👤 ASSHOLE BING' if username == 'abing' else '👤 使用者'}</b>
@@ -152,22 +157,21 @@ with st.form("chat_form", clear_on_submit=True):
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
     with cols[1]:
-        st.markdown(" ")  # 👈 增加一點垂直空間
+        st.markdown(" ")  # 垂直空間
         submitted = st.form_submit_button("送出")
     with cols[2]:
-        st.markdown(" ")  # 👈 增加一點垂直空間
+        st.markdown(" ")
         clear_clicked = st.form_submit_button("🗑️ 清除")
 
 if submitted and user_input:
     answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
-    st.session_state.chat_history.append({
+    st.session_state[chat_key].append({
         "question": user_input,
         "answer": answer,
         "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
     })
     st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
     st.rerun()
-    st.re
 
 # ========= 清除功能 =========
 if clear_clicked:
@@ -178,14 +182,14 @@ if st.session_state.confirm_clear:
     c1, c2 = st.columns(2)
     with c1:
         if st.button("✅ 是的，清除"):
-            st.session_state.chat_history = []
+            st.session_state[chat_key] = []
             st.session_state.confirm_clear = False
             st.rerun()
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
 
-
+# ========= 使用記錄 =========
 with st.expander("📊 每日使用紀錄"):
     for date_str, cost in sorted(st.session_state.daily_usage.items()):
         st.write(f"{date_str}：${round(cost, 4)}")
