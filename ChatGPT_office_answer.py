@@ -127,13 +127,23 @@ st.markdown("""
 st.markdown("### 📝 對話紀錄")
 with st.container():
     for chat in st.session_state.chat_history:
-        st.markdown(f'''
-            <div style="margin-bottom: 70px;">
-                <div class="chat-bubble-user">{chat["question"]}</div>
-                <div class="chat-bubble-bot">{chat["answer"]}</div>
-                <div class="chat-meta">{chat["meta"]}</div>
-            </div>
-        ''', unsafe_allow_html=True)
+        col1, col2 = st.columns([1, 1])
+
+        with col1:
+            st.markdown(
+                f'<div style="background:#DCF8C6;padding:10px;border-radius:15px;display:inline-block;">{chat["question"]}</div>',
+                unsafe_allow_html=True
+            )
+
+        with col2:
+            st.markdown(
+                f'<div style="background:#F1F0F0;padding:10px;border-radius:15px;display:inline-block;">{chat["answer"]}</div>',
+                unsafe_allow_html=True
+            )
+            st.markdown(
+                f'<div style="font-size:13px; color:#666; margin-top:5px;">{chat["meta"]}</div>',
+                unsafe_allow_html=True
+            )
 
 # ========= 對話輸入表單 =========
 with st.form("chat_form", clear_on_submit=True):
