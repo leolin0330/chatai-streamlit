@@ -152,6 +152,7 @@ with st.container():
             ''', unsafe_allow_html=True)
 
 # ========= 對話輸入表單 =========
+
 with st.form("chat_form", clear_on_submit=True):
     cols = st.columns([6, 2])
     with cols[0]:
@@ -163,22 +164,30 @@ with st.form("chat_form", clear_on_submit=True):
 clear_clicked = st.button("清除紀錄")
 
 if submitted:
-    # 只要送出，先處理文字輸入與檔案
-    if user_input:
-        answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
+    full_prompt = user_input.strip()
+
+    # 如果有上傳檔案，就讀取內容並附加到 prompt 裡
+    if uploaded_file is not None:
+        try:
+            file_content = uploaded_file.read().decode("utf-8")
+            full_prompt = f"以下是使用者提供的檔案內容：\n\n{file_content}\n\n請根據這份內容回答：{user_input}"
+            st.success(f"✅ 成功讀取檔案：{uploaded_file.name}")
+        except Exception as e:
+            st.error(f"❌ 檔案讀取錯誤：{e}")
+            full_prompt = user_input  # fallback 只用文字輸入
+
+    # 呼叫 AI 回答
+    if full_prompt:
+        answer, tokens, usd_cost, twd_cost = ask_openai(full_prompt)
         st.session_state[chat_key].append({
-            "question": user_input,
+            "question": f"{user_input}（附檔案：{uploaded_file.name})" if uploaded_file else user_input,
             "answer": answer,
             "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
         })
         st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
 
-    if uploaded_file:
-        st.success(f"已上傳檔案：{uploaded_file.name}")
-        # 這裡加你檔案處理邏輯，像是讀取檔案內容等等
-
-    # 不論是否有輸入或檔案，都 rerun 一次
     st.rerun()
+
 
 # ========= 清除功能 =========
 if clear_clicked:
