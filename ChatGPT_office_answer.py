@@ -6,6 +6,8 @@ VALID_PASSWORDS = st.secrets["passwords"]
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+if "username" not in st.session_state:
+    st.session_state.username = ""
 
 if not st.session_state.authenticated:
     st.title("🔐 請先登入")
@@ -14,6 +16,7 @@ if not st.session_state.authenticated:
     if st.button("登入"):
         if username in VALID_PASSWORDS and password == VALID_PASSWORDS[username]:
             st.session_state.authenticated = True
+            st.session_state.username = username
             st.success("✅ 登入成功！")
             st.rerun()
         else:
@@ -30,6 +33,12 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "confirm_clear" not in st.session_state:
     st.session_state.confirm_clear = False
+if "total_usd_cost" not in st.session_state:
+    st.session_state.total_usd_cost = 0.0
+
+username = st.session_state.username
+user_limits = st.secrets.get("user_limits", {})
+user_limit = user_limits.get(username, None)
 
 # 回答函式
 def ask_openai(prompt):
@@ -89,6 +98,16 @@ st.markdown("""
 
 st.title("💬 問答助手")
 
+# ✅ 提醒使用者目前金額
+if username == "ahong":
+    st.info("🛠️ 你是管理員，無金額限制")
+elif user_limit is not None:
+    remaining = round(user_limit - st.session_state.total_usd_cost, 4)
+    st.warning(f"⚠️ 你目前已使用 ${st.session_state.total_usd_cost}，剩餘：${remaining} 美元額度")
+    if remaining <= 0:
+        st.error(f"🚫 你已達到金額上限 (${user_limit})，無法繼續使用。請聯絡管理員。")
+        st.stop()
+
 # ✅ 聊天紀錄區
 st.markdown("### 📝 對話紀錄")
 with st.container():
@@ -99,20 +118,21 @@ with st.container():
 
 # ✅ 輸入表單（送出按鈕）單獨放
 with st.form("chat_form", clear_on_submit=True):
-    cols = st.columns([6, 2, 2])  # 多分三欄：輸入框 + 送出 + 清除
+    cols = st.columns([6, 2, 2])
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
     with cols[1]:
         st.write("")
-        st.write("")# 空白行，讓按鈕往下移動
+        st.write("")
         submitted = st.form_submit_button("送出")
     with cols[2]:
         st.write("")
-        st.write("")# 空白行，讓按鈕往下移動
+        st.write("")
         clear_clicked = st.form_submit_button("🗑️ 清除")
 
 if submitted and user_input:
     answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
+    st.session_state.total_usd_cost += usd_cost  # 累積金額
     st.session_state.chat_history.append({
         "question": user_input,
         "answer": answer,
