@@ -126,20 +126,12 @@ st.markdown("""
 # ========= 對話紀錄顯示 =========
 st.markdown("### 📝 對話紀錄")
 
-st.markdown("### 📝 對話紀錄")
-
 with st.container():
     for chat in st.session_state.chat_history:
         # 使用者訊息（靠左）
         st.markdown(
             f'''
-            <div style="
-                background:#DCF8C6; 
-                padding:20px 15px;      /* 上下20px，左右15px */
-                border-radius:15px; 
-                max-width:75%; 
-                margin-bottom:15px;    /* 底部間距 */
-                ">
+            <div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%; margin-bottom:10px;">
                 {chat["question"]}
             </div>
             ''',
@@ -148,14 +140,7 @@ with st.container():
         # AI 回覆訊息（靠右）
         st.markdown(
             f'''
-            <div style="
-                background:#F1F0F0; 
-                padding:20px 15px;      /* 上下20px，左右15px */
-                border-radius:15px; 
-                max-width:75%; 
-                margin-left:auto; 
-                margin-bottom:15px;    /* 底部間距 */
-                ">
+            <div style="background:#F1F0F0; padding:10px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:10px;">
                 {chat["answer"]}
             </div>
             ''',
@@ -164,12 +149,7 @@ with st.container():
         # 回覆時間
         st.markdown(
             f'''
-            <div style="
-                font-size:13px; 
-                color:#666; 
-                text-align:right; 
-                margin-bottom:25px;    /* 與下一輪對話間距 */
-                ">
+            <div style="font-size:13px; color:#666; text-align:right; margin-bottom:20px;">
                 {chat["meta"]}
             </div>
             ''',
