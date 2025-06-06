@@ -75,7 +75,6 @@ if st.button("登出"):
     st.rerun()
     st.stop()
 
-st.write(f"當前 username: {username}")
 
 st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
 
