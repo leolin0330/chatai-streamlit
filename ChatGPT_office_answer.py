@@ -46,8 +46,10 @@ else:
     # st.write("Session state keys:", list(st.session_state.keys()))
     # st.write("Username:", username)
 
-    st.title("💬 問答助手")
-    st.write(f"歡迎 {username}！")
+    if username == "abing":
+        st.write("歡迎垃圾bing！")
+    else:
+        st.write(f"歡迎 {username}！")
 
     # =====✅ 通過驗證，進入主頁 =====
     api_key = st.secrets["OPENAI_API_KEY"]
