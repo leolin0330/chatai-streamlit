@@ -5,10 +5,7 @@ from datetime import date
 # =====🔐 密碼驗證功能區塊 =====
 VALID_PASSWORDS = st.secrets["passwords"]
 
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-if not st.session_state.authenticated:
+def login():
     st.title("🔐 請先登入")
     username = st.text_input("帳號：")
     password = st.text_input("密碼：", type="password")
@@ -21,6 +18,12 @@ if not st.session_state.authenticated:
         else:
             st.error("❌ 帳號或密碼錯誤")
     st.stop()
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    login()
 
 # =====✅ 通過驗證，進入主頁 =====
 api_key = st.secrets["OPENAI_API_KEY"]
