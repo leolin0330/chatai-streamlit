@@ -153,6 +153,7 @@ with st.container():
             <hr style="border: none; border-top: 1px dashed #ccc; margin: 15px 0;">
             ''', unsafe_allow_html=True)
 
+
 # ========= 對話輸入表單 =========
 with st.form("chat_form", clear_on_submit=True):
     cols = st.columns([6, 2])
@@ -162,17 +163,29 @@ with st.form("chat_form", clear_on_submit=True):
     with cols[1]:
         submitted = st.form_submit_button("送出")
 
-clear_clicked = st.button("清除紀錄")
+# ========= 功能按鈕 =========
+col1, col2 = st.columns([1, 2])
+with col1:
+    clear_clicked = st.button("🧼 清除紀錄")
+with col2:
+    clear_file_clicked = st.button("🧹 清除已上傳檔案")
 
 # ==== 初始化記憶檔案內容用的 session_state ====
 if "uploaded_file_text" not in st.session_state:
     st.session_state.uploaded_file_text = None
     st.session_state.uploaded_file_name = None
 
+# ==== 處理檔案清除 ====
+if clear_file_clicked:
+    st.session_state.uploaded_file_text = None
+    st.session_state.uploaded_file_name = None
+    st.success("✅ 已清除上傳的檔案記憶")
+
+# ==== 處理送出 ====
 if submitted:
     full_prompt = user_input.strip()
 
-    # 如果有上傳新檔案，就重新解析並記下內容
+    # 如果有上傳新檔案，就解析內容
     if uploaded_file:
         file_text = ""
 
@@ -180,10 +193,12 @@ if submitted:
             file_text = uploaded_file.read().decode("utf-8", errors="ignore")
 
         elif uploaded_file.name.endswith(".pdf"):
+            import PyPDF2
             pdf_reader = PyPDF2.PdfReader(uploaded_file)
             file_text = "\n".join([page.extract_text() or "" for page in pdf_reader.pages])
 
         elif uploaded_file.name.endswith(".docx"):
+            import docx
             doc = docx.Document(uploaded_file)
             file_text = "\n".join([para.text for para in doc.paragraphs])
 
@@ -192,12 +207,11 @@ if submitted:
             file_text = None
 
         if file_text:
-            # 記住檔案內容和名稱
             st.session_state.uploaded_file_text = file_text
             st.session_state.uploaded_file_name = uploaded_file.name
             st.info("📖 檔案內容已成功讀取，現在可以根據這份文件問問題")
 
-    # 判斷是要送出單純問題，還是附加檔案的 prompt
+    # 如果有輸入文字就送出問題
     if user_input:
         if st.session_state.uploaded_file_text:
             prompt_with_file = f"以下是使用者的檔案內容：\n\n{st.session_state.uploaded_file_text}\n\n問題：{user_input}"
