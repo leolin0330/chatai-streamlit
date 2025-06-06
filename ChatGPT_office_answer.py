@@ -132,8 +132,8 @@ if st.session_state.confirm_clear:
             st.session_state.confirm_clear = False
 
 
-git add ChatGPT_office_answer.py
-git commit -m "更新 ChatGPT_office_answer 的功能"
-git push origin main
+# git add ChatGPT_office_answer.py
+# git commit -m "更新 ChatGPT_office_answer 的功能"
+# git push origin main
 
 
