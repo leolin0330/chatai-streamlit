@@ -153,7 +153,7 @@ with st.container():
 
 # ========= 對話輸入表單 =========
 with st.form("chat_form", clear_on_submit=True):
-    cols = st.columns([6, 1.0, 1.4])
+    cols = st.columns([6, 0.5, 1.4])
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
     with cols[1]:
