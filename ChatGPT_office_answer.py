@@ -3,6 +3,8 @@ from openai import OpenAI, OpenAIError
 from datetime import date
 import json
 import os
+import docx
+import PyPDF2
 
 USAGE_FILE = "daily_usage.json"
 
@@ -167,26 +169,38 @@ if submitted:
     full_prompt = user_input.strip()
 
     # 如果有上傳檔案，就讀取內容並附加到 prompt 裡
-    if uploaded_file is not None:
-        try:
-            file_content = uploaded_file.read().decode("utf-8")
-            full_prompt = f"以下是使用者提供的檔案內容：\n\n{file_content}\n\n請根據這份內容回答：{user_input}"
-            st.success(f"✅ 成功讀取檔案：{uploaded_file.name}")
-        except Exception as e:
-            st.error(f"❌ 檔案讀取錯誤：{e}")
-            full_prompt = user_input  # fallback 只用文字輸入
+    if uploaded_file:
+        st.success(f"已上傳檔案：{uploaded_file.name}")
+        file_text = ""
 
-    # 呼叫 AI 回答
-    if full_prompt:
-        answer, tokens, usd_cost, twd_cost = ask_openai(full_prompt)
-        st.session_state[chat_key].append({
-            "question": f"{user_input}（附檔案：{uploaded_file.name})" if uploaded_file else user_input,
-            "answer": answer,
-            "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
-        })
-        st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
+        if uploaded_file.name.endswith(".txt"):
+            file_text = uploaded_file.read().decode("utf-8", errors="ignore")
 
-    st.rerun()
+        elif uploaded_file.name.endswith(".pdf"):
+            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            file_text = "\n".join([page.extract_text() or "" for page in pdf_reader.pages])
+
+        elif uploaded_file.name.endswith(".docx"):
+            doc = docx.Document(uploaded_file)
+            file_text = "\n".join([para.text for para in doc.paragraphs])
+
+        else:
+            st.warning("❌ 不支援的檔案格式，目前僅支援 .txt、.pdf、.docx")
+            file_text = None
+
+        if file_text:
+            st.info("📖 檔案內容已成功讀取，開始處理問題…")
+            # 把問題與檔案內容組合起來
+            prompt_with_file = f"以下是使用者的檔案內容：\n\n{file_text}\n\n問題：{user_input}"
+            answer, tokens, usd_cost, twd_cost = ask_openai(prompt_with_file)
+            st.session_state[chat_key].append({
+                "question": f"{user_input}\n（來自上傳檔案：{uploaded_file.name}）",
+                "answer": answer,
+                "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
+            })
+            st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
+            st.rerun()
+
 
 
 # ========= 清除功能 =========
