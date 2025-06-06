@@ -127,23 +127,28 @@ st.markdown("""
 st.markdown("### 📝 對話紀錄")
 with st.container():
     for chat in st.session_state.chat_history:
-        col1, col2 = st.columns([1, 1])
+        # 使用者訊息（靠左）
+        st.markdown(
+            f"""
+            <div style='display: flex; justify-content: flex-start; margin-bottom: 5px;'>
+                <div style='background-color: #DCF8C6; padding: 10px 15px; border-radius: 15px; max-width: 75%;'>
+                    {chat["question"]}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
-        with col1:
-            st.markdown(
-                f'<div style="background:#DCF8C6;padding:10px;border-radius:15px;display:inline-block;">{chat["question"]}</div>',
-                unsafe_allow_html=True
-            )
-
-        with col2:
-            st.markdown(
-                f'<div style="background:#F1F0F0;padding:10px;border-radius:15px;display:inline-block;">{chat["answer"]}</div>',
-                unsafe_allow_html=True
-            )
-            st.markdown(
-                f'<div style="font-size:13px; color:#666; margin-top:5px;">{chat["meta"]}</div>',
-                unsafe_allow_html=True
-            )
+        # AI 回覆訊息（靠右）
+        st.markdown(
+            f"""
+            <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
+                <div style='background-color: #F1F0F0; padding: 10px 15px; border-radius: 15px; max-width: 75%;'>
+                    {chat["answer"]}
+                </div>
+            </div>
+            <div style='text-align: right; font-size: 12px; color: gray; margin-bottom: 30px;'>
+                {chat["meta"]}
+            </div>
+            """, unsafe_allow_html=True)
 
 # ========= 對話輸入表單 =========
 with st.form("chat_form", clear_on_submit=True):
