@@ -117,10 +117,12 @@ st.markdown("### 📝 對話紀錄")
 with st.container():
     for chat in st.session_state.chat_history:
         st.markdown(f'''
+            <div style="font-size:13px; color:#555; margin-bottom:3px;">👤 使用者</div>
             <div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%; margin-bottom:30px;">
                 {chat["question"]}
             </div>''', unsafe_allow_html=True)
         st.markdown(f'''
+            <div style="font-size:13px; color:#555; margin-bottom:3px;">👤 ai</div>
             <div style="background:#F1F0F0; padding:10px 15px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:30px;">
                 {chat["answer"]}
             </div>''', unsafe_allow_html=True)
