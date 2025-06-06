@@ -136,18 +136,17 @@ with st.form("chat_form", clear_on_submit=True):
     with cols[1]:
         submitted = st.form_submit_button("送出")
 
-if submitted and user_input:
-    answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
-    st.session_state.chat_history.append({
-        "question": user_input,
-        "answer": answer,
-        "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
-    })
-    st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
-    save_daily_usage(st.session_state.daily_usage)
-    st.rerun()
+    if submitted and user_input:
+        answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
+        st.session_state.chat_history.append({
+            "question": user_input,
+            "answer": answer,
+            "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
+        })
+        st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
+        save_daily_usage(st.session_state.daily_usage)
+        st.experimental_rerun()  # 如果 st.rerun() 报错，可以换成这个
 
-# 清除按鈕分離，不放在 form 中
 if st.button("🗑️ 清除所有對話紀錄"):
     st.session_state.confirm_clear = True
 
@@ -158,11 +157,12 @@ if st.session_state.confirm_clear:
         if st.button("✅ 是的，清除"):
             st.session_state.chat_history = []
             st.session_state.confirm_clear = False
-            st.rerun()
+            st.experimental_rerun()
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
-            st.rerun()
+            st.experimental_rerun()
+
 
 with st.expander("📊 每日使用紀錄"):
     for date_str, cost in sorted(st.session_state.daily_usage.items()):
