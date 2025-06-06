@@ -43,8 +43,8 @@ else:
     username = st.session_state.username
 
     # 印出除錯資訊（可開可關）
-    st.write("Session state keys:", list(st.session_state.keys()))
-    st.write("Username:", username)
+    # st.write("Session state keys:", list(st.session_state.keys()))
+    # st.write("Username:", username)
 
     st.title("💬 問答助手")
     st.write(f"歡迎 {username}！")
