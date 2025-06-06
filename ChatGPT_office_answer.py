@@ -125,16 +125,36 @@ st.markdown("""
 
 # ========= 對話紀錄顯示 =========
 st.markdown("### 📝 對話紀錄")
+
 with st.container():
     for chat in st.session_state.chat_history:
+        # 使用者訊息（靠左）
         st.markdown(
-            f'<div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%;">{chat["question"]}</div>',
+            f'''
+            <div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%; margin-bottom:10px;">
+                {chat["question"]}
+            </div>
+            ''',
             unsafe_allow_html=True)
+
+        # AI 回覆訊息（靠右）
         st.markdown(
-            f'<div style="background:#F1F0F0; padding:10px; border-radius:15px; max-width:75%; margin-left:auto;">{chat["answer"]}</div>',
+            f'''
+            <div style="background:#F1F0F0; padding:10px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:10px;">
+                {chat["answer"]}
+            </div>
+            ''',
             unsafe_allow_html=True)
-        st.markdown(f'<div style="font-size:13px; color:#666; text-align:right;">{chat["meta"]}</div>',
-                    unsafe_allow_html=True)
+
+        # 回覆時間
+        st.markdown(
+            f'''
+            <div style="font-size:13px; color:#666; text-align:right; margin-bottom:20px;">
+                {chat["meta"]}
+            </div>
+            ''',
+            unsafe_allow_html=True)
+
 
 # ========= 對話輸入表單 =========
 with st.form("chat_form", clear_on_submit=True):
