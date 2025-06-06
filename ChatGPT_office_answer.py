@@ -99,11 +99,13 @@ with st.container():
 
 # ✅ 輸入表單（送出按鈕）單獨放
 with st.form("chat_form", clear_on_submit=True):
-    cols = st.columns([7, 2])
+    cols = st.columns([6, 2, 2])  # 多分三欄：輸入框 + 送出 + 清除
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
     with cols[1]:
         submitted = st.form_submit_button("送出")
+    with cols[2]:
+        clear_clicked = st.form_submit_button("🗑️ 清除")
 
 if submitted and user_input:
     answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
@@ -114,11 +116,9 @@ if submitted and user_input:
     })
     st.rerun()
 
-# ✅ 清除按鈕獨立放，才不會被表單 reset 狀態
-if st.button("🗑️ 清除"):
+if clear_clicked:
     st.session_state.confirm_clear = True
 
-# ✅ 清除確認區塊
 if st.session_state.confirm_clear:
     st.warning("⚠️ 你確定要清除所有對話紀錄嗎？這個動作無法還原！")
     c1, c2 = st.columns(2)
@@ -130,3 +130,4 @@ if st.session_state.confirm_clear:
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
+
