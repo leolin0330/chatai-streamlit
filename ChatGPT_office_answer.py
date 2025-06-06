@@ -156,6 +156,7 @@ with st.form("chat_form", clear_on_submit=True):
     cols = st.columns([6, 2, 2])
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
+        uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=None)
     with cols[1]:
         st.markdown(" ")  # 垂直空間
         submitted = st.form_submit_button("送出")
@@ -163,14 +164,25 @@ with st.form("chat_form", clear_on_submit=True):
         st.markdown(" ")
         clear_clicked = st.form_submit_button("清除紀錄")
 
-if submitted and user_input:
-    answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
-    st.session_state[chat_key].append({
-        "question": user_input,
-        "answer": answer,
-        "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
-    })
-    st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
+if submitted:
+    # 先處理文字問題
+    if user_input:
+        answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
+        st.session_state[chat_key].append({
+            "question": user_input,
+            "answer": answer,
+            "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
+        })
+        st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
+
+    # 如果有上傳檔案，可以在這裡處理
+    if uploaded_file:
+        st.success(f"已上傳檔案：{uploaded_file.name}")
+        # 你可以把檔案存起來或讀取內容，這邊只是示範
+        # 例如，儲存檔案：
+        # with open(f"uploads/{uploaded_file.name}", "wb") as f:
+        #     f.write(uploaded_file.getbuffer())
+
     st.rerun()
 
 # ========= 清除功能 =========
