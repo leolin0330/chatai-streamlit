@@ -47,7 +47,7 @@ else:
     # st.write("Username:", username)
 
     if username == "abing":
-        st.write("歡迎ASSHOLE BING！")
+        st.write("歡迎ASSHOLE BING！🙂")
     else:
         st.write(f"歡迎 {username}！")
 
