@@ -130,7 +130,7 @@ with st.container():
             </div>''', unsafe_allow_html=True)
 
 with st.form("chat_form", clear_on_submit=True):
-    cols = st.columns([6, 2])
+    cols = st.columns([6, 2, 2])
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
     with cols[1]:
