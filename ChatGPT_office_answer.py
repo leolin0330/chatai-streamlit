@@ -2,6 +2,9 @@ import streamlit as st
 from openai import OpenAI, OpenAIError
 from datetime import date
 
+# 先設定頁面配置，必須第一個 Streamlit 指令
+st.set_page_config(page_title="問答助手", page_icon="💬")
+
 # =====🔐 密碼驗證功能區塊 =====
 VALID_PASSWORDS = st.secrets["passwords"]
 
@@ -31,7 +34,7 @@ if not st.session_state.authenticated:
 else:
     st.write(f"歡迎 {st.session_state.username}！")
 
-# =====✅ 通過驗證，進入主頁 =====
+# 以下就可以正常使用其他功能
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
 
