@@ -163,6 +163,7 @@ with st.form("chat_form", clear_on_submit=True):
 clear_clicked = st.button("清除紀錄")
 
 if submitted:
+    # 只要送出，先處理文字輸入與檔案
     if user_input:
         answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
         st.session_state[chat_key].append({
@@ -174,8 +175,9 @@ if submitted:
 
     if uploaded_file:
         st.success(f"已上傳檔案：{uploaded_file.name}")
-        # 這裡可以加你自己的檔案處理邏輯
+        # 這裡加你檔案處理邏輯，像是讀取檔案內容等等
 
+    # 不論是否有輸入或檔案，都 rerun 一次
     st.rerun()
 
 # ========= 清除功能 =========
