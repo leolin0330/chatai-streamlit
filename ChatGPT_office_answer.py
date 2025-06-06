@@ -49,7 +49,7 @@ else:
     if username == "abing":
         st.write("歡迎垃圾bing！")
     else:
-        st.write(f"歡 {username}！")
+        st.write(f"歡迎 {username}！")
 
     # =====✅ 通過驗證，進入主頁 =====
     api_key = st.secrets["OPENAI_API_KEY"]
