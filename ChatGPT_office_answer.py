@@ -129,6 +129,7 @@ with st.container():
                 {chat["meta"]}
             </div>''', unsafe_allow_html=True)
 
+# ========= 對話輸入表單 =========
 with st.form("chat_form", clear_on_submit=True):
     cols = st.columns([6, 2, 2])
     with cols[0]:
@@ -136,31 +137,33 @@ with st.form("chat_form", clear_on_submit=True):
     with cols[1]:
         submitted = st.form_submit_button("送出")
     with cols[2]:
-        clear_clicked = st.button("🗑️ 清除")
+        clear_clicked = st.form_submit_button("🗑️ 清除")
 
-    if submitted and user_input:
-        answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
-        st.session_state.chat_history.append({
-            "question": user_input,
-            "answer": answer,
-            "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
-        })
-        st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
-        save_daily_usage(st.session_state.daily_usage)
-        st.rerun()  # 如果 st.rerun() 报错，可以换成这个
+if submitted and user_input:
+    answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
+    st.session_state.chat_history.append({
+        "question": user_input,
+        "answer": answer,
+        "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
+    })
+    st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
+    st.rerun()
 
-    if st.session_state.confirm_clear:
-        st.warning("⚠️ 你確定要清除所有對話紀錄嗎？這個動作無法還原！")
-        c1, c2 = st.columns(2)
-        with c1:
-            if st.button("✅ 是的，清除"):
-                st.session_state.chat_history = []
-                st.session_state.confirm_clear = False
-                st.rerun()
-        with c2:
-            if st.button("❌ 取消"):
-                st.session_state.confirm_clear = False
-                st.rerun()
+# ========= 清除功能 =========
+if clear_clicked:
+    st.session_state.confirm_clear = True
+
+if st.session_state.confirm_clear:
+    st.warning("⚠️ 你確定要清除所有對話紀錄嗎？這個動作無法還原！")
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("✅ 是的，清除"):
+            st.session_state.chat_history = []
+            st.session_state.confirm_clear = False
+            st.rerun()
+    with c2:
+        if st.button("❌ 取消"):
+            st.session_state.confirm_clear = False
 
 
 with st.expander("📊 每日使用紀錄"):
