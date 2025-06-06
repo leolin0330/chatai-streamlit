@@ -51,7 +51,7 @@ def login():
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.success("登入成功")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("帳號或密碼錯誤")
 
@@ -145,7 +145,7 @@ if submitted and user_input:
     })
     st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
     save_daily_usage(st.session_state.daily_usage)
-    st.experimental_rerun()
+    st.rerun()
 
 # 清除按鈕分離，不放在 form 中
 if st.button("🗑️ 清除所有對話紀錄"):
