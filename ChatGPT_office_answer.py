@@ -131,7 +131,7 @@ with st.container():
         st.markdown(
             f"""
             <div style='display: flex; justify-content: flex-start; margin-bottom: 5px;'>
-                <div style='background-color: #DCF8C6; padding: 10px 15px; border-radius: 15px; max-width: 75%;'>
+                <div style='background-color: #DCF8C6; padding: 12px 18px; border-radius: 15px; max-width: 90%; word-wrap: break-word;'>
                     {chat["question"]}
                 </div>
             </div>
@@ -140,8 +140,8 @@ with st.container():
         # AI 回覆訊息（靠右）
         st.markdown(
             f"""
-            <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
-                <div style='background-color: #F1F0F0; padding: 10px 15px; border-radius: 15px; max-width: 75%;'>
+            <div style='display: flex; justify-content: flex-end; margin-bottom: 5px;'>
+                <div style='background-color: #F1F0F0; padding: 12px 18px; border-radius: 15px; max-width: 90%; word-wrap: break-word;'>
                     {chat["answer"]}
                 </div>
             </div>
