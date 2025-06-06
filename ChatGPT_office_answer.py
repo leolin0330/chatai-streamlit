@@ -73,7 +73,7 @@ st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}�
 if st.button("登出"):
     st.session_state.authenticated = False
     st.session_state.username = None
-    st.rerun()
+    st.experimental_rerun()
 
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
