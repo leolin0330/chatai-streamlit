@@ -35,16 +35,14 @@ if "confirm_clear" not in st.session_state:
     st.session_state.confirm_clear = False
 if "daily_usage" not in st.session_state:
     st.session_state.daily_usage = {}
-if "total_usd_cost" not in st.session_state:
-    st.session_state.total_usd_cost = 0.0
 
-# 每日使用金額限制（可以改成依照帳號不同調整）
+# 每日使用金額限制（可以依帳號調整）
 DAILY_LIMITS = {
     "ahong": None,  # 管理員無限制
     "abing": 0.05,  # 使用者每日限制0.05美元
 }
 username = st.session_state.username
-user_limit = DAILY_LIMITS.get(username, 0.05)  # 預設0.05限制
+user_limit = DAILY_LIMITS.get(username, 0.05)  # 預設限制0.05美元
 
 # 回答函式
 def ask_openai(prompt):
@@ -60,8 +58,8 @@ def ask_openai(prompt):
         )
         answer = response.choices[0].message.content.strip()
         tokens_used = response.usage.total_tokens
-        usd_cost = round(tokens_used * 0.01 / 1000, 6)
-        twd_cost = round(usd_cost * 32, 4)
+        usd_cost = round(tokens_used * 0.01 / 1000, 6)  # 估算費用，0.01 USD / 1000 tokens
+        twd_cost = round(usd_cost * 32, 4)  # 換算台幣
         return answer, tokens_used, usd_cost, twd_cost
     except OpenAIError as e:
         return f"❌ API 錯誤：{str(e)}", 0, 0.0, 0.0
@@ -104,16 +102,19 @@ st.markdown("""
 
 st.title("💬 問答助手")
 
-# 金額限制檢查（非管理員才執行）
+# 今日日期
+today = str(date.today())
+
+# 取得今日已使用金額
+today_used = st.session_state.daily_usage.get(today, 0.0)
+remaining = round(user_limit - today_used, 4) if user_limit is not None else None
+
+# 顯示金額限制及剩餘
 if username == "ahong":
     st.info("🛠️ 你是管理員，無金額限制")
 else:
-    today = str(date.today())
-    today_used = st.session_state.daily_usage.get(today, 0.0)
-    remaining = round(user_limit - today_used, 4)
     st.warning(f"⚠️ 今日已使用：${round(today_used,4)}，剩餘：${remaining} 美元")
-
-    if remaining <= 0:
+    if remaining is not None and remaining <= 0:
         st.error(f"🚫 你今天已達到金額上限 (${user_limit})，無法繼續使用。請聯絡管理員。")
         st.stop()
 
@@ -139,7 +140,7 @@ with st.form("chat_form", clear_on_submit=True):
         st.write("")
         clear_clicked = st.form_submit_button("🗑️ 清除")
 
-# 送出處理
+# 送出問題後處理
 if submitted and user_input:
     answer, tokens, usd_cost, twd_cost = ask_openai(user_input)
     st.session_state.chat_history.append({
@@ -148,16 +149,12 @@ if submitted and user_input:
         "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
     })
 
-    # 累計今日花費
-    today = str(date.today())
-    if today not in st.session_state.daily_usage:
-        st.session_state.daily_usage[today] = 0.0
-    st.session_state.daily_usage[today] += usd_cost
-    st.session_state.total_usd_cost += usd_cost
+    # 累計今日使用費用
+    st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
 
     st.experimental_rerun()
 
-# 清除對話確認
+# 清除聊天紀錄確認
 if clear_clicked:
     st.session_state.confirm_clear = True
 
@@ -173,7 +170,7 @@ if st.session_state.confirm_clear:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
 
-# 顯示每日使用紀錄
+# 展開區顯示每日使用紀錄
 with st.expander("📊 每日使用紀錄"):
     for date_str, cost in sorted(st.session_state.daily_usage.items()):
         st.write(f"{date_str}：${round(cost, 4)}")
