@@ -168,7 +168,7 @@ col1, col2 = st.columns([1, 2])
 with col1:
     clear_clicked = st.button("🧼 清除紀錄")
 with col2:
-    clear_file_clicked = st.button("🧹 清除已上傳檔案")
+    clear_file_clicked = st.button("🧹 清除已上傳檔案記憶")
 
 # ==== 初始化記憶檔案內容用的 session_state ====
 if "uploaded_file_text" not in st.session_state:
