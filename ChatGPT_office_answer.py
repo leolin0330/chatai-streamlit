@@ -131,7 +131,7 @@ with st.container():
         # 使用者訊息（靠左）
         st.markdown(
             f'''
-            <div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%; margin-bottom:20px;">
+            <div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%; margin-bottom:30px;">
                 {chat["question"]}
             </div>
             ''',
@@ -140,7 +140,7 @@ with st.container():
         # AI 回覆訊息（靠右）
         st.markdown(
             f'''
-            <div style="background:#F1F0F0; padding:10px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:10px;">
+            <div style="background:#F1F0F0; padding:10px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:30px;">
                 {chat["answer"]}
             </div>
             ''',
