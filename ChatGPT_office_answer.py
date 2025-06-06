@@ -1,6 +1,29 @@
 import streamlit as st
 from openai import OpenAI, OpenAIError
 from datetime import date
+import json
+import os
+
+# ========= 檔案路徑 =========
+USAGE_FILE = "daily_usage.json"
+
+# ========= 載入每日使用紀錄 =========
+def load_daily_usage():
+    if os.path.exists(USAGE_FILE):
+        try:
+            with open(USAGE_FILE, "r") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+# ========= 儲存每日使用紀錄 =========
+def save_daily_usage(data):
+    try:
+        with open(USAGE_FILE, "w") as f:
+            json.dump(data, f)
+    except Exception as e:
+        st.error(f"儲存使用紀錄失敗：{e}")
 
 # ========= 頁面基本設定 =========
 st.set_page_config(page_title="問答助手", page_icon="💬")
@@ -15,6 +38,10 @@ for key, default in {
 }.items():
     if key not in st.session_state:
         st.session_state[key] = default
+
+# 如果 session_state 的 daily_usage 是空的，嘗試從檔案載入
+if not st.session_state.daily_usage:
+    st.session_state.daily_usage = load_daily_usage()
 
 # ========= 密碼驗證機制 =========
 VALID_PASSWORDS = st.secrets["passwords"]
@@ -31,7 +58,7 @@ def login():
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.success("登入成功")
-                st.rerun()
+                st.experimental_rerun()
             else:
                 st.error("帳號或密碼錯誤")
 
@@ -140,7 +167,7 @@ with st.container():
         # AI 回覆訊息（靠右）
         st.markdown(
             f'''
-            <div style="background:#F1F0F0; padding:10px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:30px;">
+            <div style="background:#F1F0F0; padding:10px 15px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:30px;">
                 {chat["answer"]}
             </div>
             ''',
@@ -173,8 +200,12 @@ if submitted and user_input:
         "answer": answer,
         "meta": f"🧾 使用 Token 數：{tokens}    💵 估算費用：${usd_cost} 美元（約 NT${twd_cost}）"
     })
+
+    # 更新每日使用並存檔
     st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
-    st.rerun()
+    save_daily_usage(st.session_state.daily_usage)
+
+    st.experimental_rerun()
 
 # ========= 清除功能 =========
 if clear_clicked:
@@ -187,7 +218,7 @@ if st.session_state.confirm_clear:
         if st.button("✅ 是的，清除"):
             st.session_state.chat_history = []
             st.session_state.confirm_clear = False
-            st.rerun()
+            st.experimental_rerun()
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
