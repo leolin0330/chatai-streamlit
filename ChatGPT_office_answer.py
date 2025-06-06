@@ -51,7 +51,7 @@ def login():
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.success("登入成功")
-                st.rerun()
+                st.experimental_rerun()()
             else:
                 st.error("帳號或密碼錯誤")
 
