@@ -129,14 +129,14 @@ with st.container():
             <div style="font-size:13px; color:#555; margin-left:8px; margin-bottom:3px;">
                 <b>{'👤 ASSHOLE BING' if username == 'abing' else '👤 使用者'}</b>
             </div>
-            <div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%; margin-bottom:30px;">
+            <div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%; margin-bottom:20px;">
                 {chat["question"]}
             </div>''', unsafe_allow_html=True)
         st.markdown(f'''
             <b><div style="font-size:13px; color:#555; text-align:right; margin-right:8px; margin-bottom:5px;">
                 🤖 助手
             </div></b>
-            <div style="background:#F1F0F0; padding:10px 15px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:30px;">
+            <div style="background:#F1F0F0; padding:10px 15px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:20px;">
                 {chat["answer"]}
             </div>''', unsafe_allow_html=True)
         st.markdown(f'''
