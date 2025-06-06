@@ -73,7 +73,7 @@ st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}�
 if st.button("登出"):
     st.session_state.authenticated = False
     st.session_state.username = None
-    st.experimental_rerun()
+    st.rerun()
 
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
@@ -170,6 +170,7 @@ if submitted and user_input:
     })
     st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
     st.rerun()
+    st.re
 
 # ========= 清除功能 =========
 if clear_clicked:
