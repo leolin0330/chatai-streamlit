@@ -90,7 +90,7 @@ st.markdown("""
 st.title("💬 問答助手")
 
 # ✅ 聊天紀錄區
-st.markdown("## 📝 對話紀錄")
+st.markdown("### 📝 對話紀錄")
 with st.container():
     for chat in st.session_state.chat_history:
         st.markdown(f'<div class="chat-bubble-user">{chat["question"]}</div>', unsafe_allow_html=True)
@@ -130,4 +130,10 @@ if st.session_state.confirm_clear:
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
+
+
+git add ChatGPT_office_answer.py
+git commit -m "更新 ChatGPT_office_answer 的功能"
+git push origin main
+
 
