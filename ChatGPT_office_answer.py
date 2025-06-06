@@ -158,11 +158,11 @@ if st.session_state.confirm_clear:
         if st.button("✅ 是的，清除"):
             st.session_state.chat_history = []
             st.session_state.confirm_clear = False
-            st.experimental_rerun()
+            st.rerun()
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
-            st.experimental_rerun()
+            st.rerun()
 
 with st.expander("📊 每日使用紀錄"):
     for date_str, cost in sorted(st.session_state.daily_usage.items()):
