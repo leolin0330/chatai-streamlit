@@ -135,11 +135,9 @@ with st.form("chat_form", clear_on_submit=True):
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
     with cols[1]:
-        st.markdown(" ")
         st.markdown(" ")  # 👈 增加一點垂直空間
         submitted = st.form_submit_button("送出")
     with cols[2]:
-        st.markdown(" ")
         st.markdown(" ")  # 👈 增加一點垂直空間
         clear_clicked = st.form_submit_button("🗑️ 清除")
 
