@@ -103,8 +103,10 @@ with st.form("chat_form", clear_on_submit=True):
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
     with cols[1]:
+        st.write("")  # 空白行，讓按鈕往下移動
         submitted = st.form_submit_button("送出")
     with cols[2]:
+        st.write("")  # 空白行，讓按鈕往下移動
         clear_clicked = st.form_submit_button("🗑️ 清除")
 
 if submitted and user_input:
