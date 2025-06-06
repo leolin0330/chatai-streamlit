@@ -145,7 +145,7 @@ with st.form("chat_form", clear_on_submit=True):
         })
         st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
         save_daily_usage(st.session_state.daily_usage)
-        st.experimental_rerun()  # 如果 st.rerun() 报错，可以换成这个
+        st.rerun()  # 如果 st.rerun() 报错，可以换成这个
 
 if st.button("🗑️ 清除所有對話紀錄"):
     st.session_state.confirm_clear = True
@@ -157,11 +157,11 @@ if st.session_state.confirm_clear:
         if st.button("✅ 是的，清除"):
             st.session_state.chat_history = []
             st.session_state.confirm_clear = False
-            st.experimental_rerun()
+            st.rerun()
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
-            st.experimental_rerun()
+            st.rerun()
 
 
 with st.expander("📊 每日使用紀錄"):
