@@ -116,7 +116,7 @@ else:
             background-color: #DCF8C6;
             padding: 10px 15px;
             border-radius: 15px;
-            margin: 10px 0 10px 10px;   /* 上右下左：左邊加10px間距 */
+            margin: 12px 0 12px 10px;  /* 上 12px，右 0，下 12px，左 10px */
             max-width: 75%;
             align-self: flex-start;
         }
@@ -125,7 +125,7 @@ else:
             background-color: #F1F0F0;
             padding: 10px 15px;
             border-radius: 15px;
-            margin: 10px 10px 10px 0;   /* 上右下左：右邊加10px間距 */
+            margin: 12px 10px 12px 0;  /* 上 12px，右 10px，下 12px，左 0 */
             max-width: 75%;
             align-self: flex-end;
         }
