@@ -142,7 +142,9 @@ with st.container():
         st.markdown(f'''
             <div style="font-size:13px; color:#666; text-align:right; margin-bottom:20px;">
                 {chat["meta"]}
-            </div>''', unsafe_allow_html=True)
+            </div>
+            <hr style="border: none; border-top: 1px dashed #ccc; margin: 15px 0;">
+            ''', unsafe_allow_html=True)
 
 # ========= 對話輸入表單 =========
 with st.form("chat_form", clear_on_submit=True):
