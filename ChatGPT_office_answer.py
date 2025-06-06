@@ -174,7 +174,7 @@ else:
 
         st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
 
-        st.experimental_rerun()
+        st.rerun()
 
     if clear_clicked:
         st.session_state.confirm_clear = True
