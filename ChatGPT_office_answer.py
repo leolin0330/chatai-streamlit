@@ -58,7 +58,7 @@ def login():
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.success("登入成功")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("帳號或密碼錯誤")
 
@@ -218,7 +218,7 @@ if st.session_state.confirm_clear:
         if st.button("✅ 是的，清除"):
             st.session_state.chat_history = []
             st.session_state.confirm_clear = False
-            st.experimental_rerun()
+            st.rerun()
     with c2:
         if st.button("❌ 取消"):
             st.session_state.confirm_clear = False
