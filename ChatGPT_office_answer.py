@@ -122,7 +122,7 @@ with st.container():
                 {chat["question"]}
             </div>''', unsafe_allow_html=True)
         st.markdown(f'''
-            <div style="font-size:13px; color:#555; margin-left:auto;margin-bottom:3px;">👤 ai</div>
+            <div style="font-size:13px; color:#555; margin-right:auto;margin-bottom:3px;">👤 ai</div>
             <div style="background:#F1F0F0; padding:10px 15px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:30px;">
                 {chat["answer"]}
             </div>''', unsafe_allow_html=True)
