@@ -75,6 +75,8 @@ if st.button("登出"):
     st.rerun()
     st.stop()
 
+st.write(f"當前 username: {username}")
+
 st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
 
 api_key = st.secrets["OPENAI_API_KEY"]
@@ -139,7 +141,7 @@ with st.container():
     for chat in st.session_state[chat_key]:
         st.markdown(f'''
             <div style="font-size:13px; color:#555; margin-left:8px; margin-bottom:3px;">
-                <b>{'👤 ASSHOLE BING123' if username == 'abing' else f'👤 {username}'}</b>
+                <b>{'👤 ASSHOLE BING' if username == 'abing' else f'👤 {username}'}</b>
             </div>
             <div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%; margin-bottom:10px;">
                 {chat["question"]}
