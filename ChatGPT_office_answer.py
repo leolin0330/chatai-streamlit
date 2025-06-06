@@ -116,18 +116,18 @@ else:
             background-color: #DCF8C6;
             padding: 10px 15px;
             border-radius: 15px;
-            margin: 10px 0;
+            margin: 10px 0 10px 10px;   /* 上右下左：左邊加10px間距 */
             max-width: 75%;
             align-self: flex-start;
         }
+        
         .chat-bubble-bot {
             background-color: #F1F0F0;
             padding: 10px 15px;
             border-radius: 15px;
-            margin: 10px 0;
+            margin: 10px 10px 10px 0;   /* 上右下左：右邊加10px間距 */
             max-width: 75%;
             align-self: flex-end;
-            margin-left: auto;
         }
         .chat-meta {
             font-size: 13px;
