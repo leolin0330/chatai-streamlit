@@ -87,10 +87,10 @@ if username == "ahong":
     user_limit = None
 elif username == "abing":
     user_type = "special"
-    user_limit = 0.05
+    user_limit = 0.01
 else:
     user_type = "user"
-    user_limit = 0.05
+    user_limit = 0.01
 
 today = str(date.today())
 today_used = st.session_state.daily_usage.get(today, 0.0)
