@@ -77,7 +77,7 @@ if st.button("登出"):
 
 
 
-st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
+st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！我是阿宏我超帥")
 
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
