@@ -24,7 +24,7 @@ def save_daily_usage(data):
     except Exception as e:
         st.error(f"儲存使用紀錄失敗：{e}")
 
-st.set_page_config(page_title="阿宏人見人愛", page_icon="💬")
+st.set_page_config(page_title="阿宏人見人愛", page_icon="😎")
 
 # 初始化 session_state（登入前）
 for key, default in {
