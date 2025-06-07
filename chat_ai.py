@@ -53,7 +53,7 @@ def login():
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.success("登入成功")
-                st.rerun()
+                st.experimental_rerun()
             else:
                 st.error("帳號或密碼錯誤")
 
@@ -72,53 +72,10 @@ if chat_key not in st.session_state:
 if st.button("登出"):
     st.session_state.authenticated = False
     st.session_state.username = None
-    st.rerun()
+    st.experimental_rerun()
     st.stop()
 
-# -----------------------------
-if "dark_mode" not in st.session_state:
-    st.session_state.dark_mode = False
 
-def toggle_bg():
-    st.session_state.dark_mode = not st.session_state.dark_mode
-    st.rerun()  # 點擊後強制重新執行，確保 CSS 變動
-
-st.button("切換背景色", on_click=toggle_bg)
-
-if st.session_state.dark_mode:
-    st.markdown(
-        """
-        <style>
-        /* 主要背景色改深色 */
-        .css-18e3th9, .main, .block-container {
-            background-color: #121212 !important;
-            color: white !important; /* 文字改白，避免看不清 */
-        }
-        body {
-            background-color: #121212 !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-else:
-    st.markdown(
-        """
-        <style>
-        .css-18e3th9, .main, .block-container {
-            background-color: white !important;
-            color: black !important;
-        }
-        body {
-            background-color: white !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-st.write("點按鈕切換背景色")
-# -----------------------------
 
 st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
 
