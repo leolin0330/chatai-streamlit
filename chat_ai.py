@@ -106,17 +106,17 @@ remaining = round(user_limit - today_used, 4) if user_limit is not None else Non
 
 if user_type == "admin":
     st.markdown(
-        '<div style="background-color:#e1f5fe;padding:10px;border-radius:5px;"><span style="font-size:10px;">🛠️ 你是管理員，無金額限制</span></div>',
+        '<span style="font-size:10px;">🛠️ 你是管理員，無金額限制</span>',
         unsafe_allow_html=True
     )
 else:
     st.markdown(
-        f'<div style="background-color:#fff3cd;padding:10px;border-radius:5px;"><span style="font-size:10px;">⚠️ 今日已使用：${round(today_used, 4)}，剩餘：${remaining} 美元</span></div>',
+        f'<span style="font-size:10px;">⚠️ 今日已使用：${round(today_used, 4)}，剩餘：${remaining} 美元</span>',
         unsafe_allow_html=True
     )
     if remaining is not None and remaining <= 0:
         st.markdown(
-            '<div style="background-color:#f8d7da;padding:10px;border-radius:5px;"><span style="font-size:10px;">🚫 今日已達金額上限，請明天再來或聯絡管理員。</span></div>',
+            '<span style="font-size:10px;">🚫 今日已達金額上限，請明天再來或聯絡管理員。</span>',
             unsafe_allow_html=True
         )
         st.stop()
