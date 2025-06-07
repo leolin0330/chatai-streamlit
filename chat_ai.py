@@ -185,6 +185,8 @@ with st.form("chat_form", clear_on_submit=True):
         user_input = st.text_input("💡 請輸入你的問題：")
         uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=["txt", "pdf", "docx"])
     with cols[1]:
+        # 增加垂直空間讓按鈕視覺靠下
+        st.markdown("<div style='height:70px;'></div>", unsafe_allow_html=True)
         submitted = st.form_submit_button("送出")
 
 # ========= 功能按鈕 =========
@@ -204,6 +206,7 @@ if clear_file_clicked:
     st.session_state.uploaded_file_text = None
     st.session_state.uploaded_file_name = None
     st.success("✅ 已清除上傳的檔案記憶")
+
 
 # ==== 處理送出 ====
 if submitted:
