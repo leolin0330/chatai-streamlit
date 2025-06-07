@@ -75,6 +75,52 @@ if st.button("登出"):
     st.experimental_rerun()
     st.stop()
 
+# -----------------------------
+import streamlit as st
+
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = False
+
+def toggle_bg():
+    st.session_state.dark_mode = not st.session_state.dark_mode
+
+st.button("切換背景色", on_click=toggle_bg)
+
+if st.session_state.dark_mode:
+    st.markdown(
+        """
+        <style>
+        /* 主要背景色改深色 */
+        .css-18e3th9, .main {
+            background-color: #121212 !important;
+        }
+        /* 讓 body 背景也改 */
+        body {
+            background-color: #121212 !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+else:
+    st.markdown(
+        """
+        <style>
+        .css-18e3th9, .main {
+            background-color: white !important;
+        }
+        body {
+            background-color: white !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+st.write("這是頁面內容，背景會根據按鈕切換")
+
+# -----------------------------
+
 st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
 
 api_key = st.secrets["OPENAI_API_KEY"]
