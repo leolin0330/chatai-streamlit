@@ -76,13 +76,12 @@ if st.button("登出"):
     st.stop()
 
 # -----------------------------
-import streamlit as st
-
 if "dark_mode" not in st.session_state:
     st.session_state.dark_mode = False
 
 def toggle_bg():
     st.session_state.dark_mode = not st.session_state.dark_mode
+    st.experimental_rerun()  # 點擊後強制重新執行，確保 CSS 變動
 
 st.button("切換背景色", on_click=toggle_bg)
 
@@ -91,10 +90,10 @@ if st.session_state.dark_mode:
         """
         <style>
         /* 主要背景色改深色 */
-        .css-18e3th9, .main {
+        .css-18e3th9, .main, .block-container {
             background-color: #121212 !important;
+            color: white !important; /* 文字改白，避免看不清 */
         }
-        /* 讓 body 背景也改 */
         body {
             background-color: #121212 !important;
         }
@@ -106,8 +105,9 @@ else:
     st.markdown(
         """
         <style>
-        .css-18e3th9, .main {
+        .css-18e3th9, .main, .block-container {
             background-color: white !important;
+            color: black !important;
         }
         body {
             background-color: white !important;
@@ -117,8 +117,7 @@ else:
         unsafe_allow_html=True,
     )
 
-st.write("這是頁面內容，背景會根據按鈕切換")
-
+st.write("點按鈕切換背景色")
 # -----------------------------
 
 st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
