@@ -26,6 +26,48 @@ def save_daily_usage(data):
 
 st.set_page_config(page_title="阿宏人見人愛", page_icon="😎")
 
+# --- 深色/淺色模式切換初始化 ---
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = False
+
+def toggle_theme():
+    st.session_state.dark_mode = not st.session_state.dark_mode
+
+# 頁面最上方的主題切換按鈕
+st.button(
+    "🌗 切換深色/淺色模式",
+    on_click=toggle_theme
+)
+
+# 根據模式注入 CSS
+if st.session_state.dark_mode:
+    st.markdown("""
+        <style>
+        body, .css-18e3th9 {
+            background-color: #121212 !important;
+            color: #eee !important;
+        }
+        .stTextInput>div>div>input {
+            background-color: #333 !important;
+            color: #eee !important;
+        }
+        /* 你可以依需求擴充其他元件樣式 */
+        </style>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+        <style>
+        body, .css-18e3th9 {
+            background-color: #fff !important;
+            color: #000 !important;
+        }
+        .stTextInput>div>div>input {
+            background-color: #fff !important;
+            color: #000 !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
 # 初始化 session_state（登入前）
 for key, default in {
     "authenticated": False,
@@ -53,7 +95,7 @@ def login():
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.success("登入成功")
-                st.rerun()
+                st.experimental_rerun()
             else:
                 st.error("帳號或密碼錯誤")
 
@@ -72,9 +114,8 @@ if chat_key not in st.session_state:
 if st.button("登出"):
     st.session_state.authenticated = False
     st.session_state.username = None
-    st.rerun()
+    st.experimental_rerun()
     st.stop()
-
 
 st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
 
@@ -96,14 +137,7 @@ today = str(date.today())
 today_used = st.session_state.daily_usage.get(today, 0.0)
 remaining = round(user_limit - today_used, 4) if user_limit is not None else None
 
-# if user_type == "admin":
-#     st.info("🛠️ 你是管理員，無金額限制")
-# else:
-#     st.warning(f"⚠️ 今日已使用：${round(today_used, 4)}，剩餘：${remaining} 美元")
-#     if remaining is not None and remaining <= 0:
-#         st.error("🚫 今日已達金額上限，請明天再來或聯絡管理員。")
-#         st.stop()
-
+# 顯示今日餘額
 if user_type == "admin":
     st.markdown(
         '<span style="font-size:10px;">🛠️ 你是管理員，無金額限制</span>',
@@ -120,7 +154,6 @@ else:
             unsafe_allow_html=True
         )
         st.stop()
-
 
 def ask_openai(prompt):
     try:
@@ -140,6 +173,7 @@ def ask_openai(prompt):
         return answer, tokens_used, usd_cost, twd_cost
     except OpenAIError as e:
         return f"❌ API 錯誤：{str(e)}", 0, 0.0, 0.0
+
 
 st.markdown("""
 <style>
