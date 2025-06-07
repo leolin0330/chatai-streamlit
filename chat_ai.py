@@ -186,7 +186,7 @@ with st.form("chat_form", clear_on_submit=True):
         uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=["txt", "pdf", "docx"])
     with cols[1]:
         # 增加垂直空間讓按鈕視覺靠下
-        st.markdown("<div style='height:100px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
         submitted = st.form_submit_button("送出")
 
 # ========= 功能按鈕 =========
