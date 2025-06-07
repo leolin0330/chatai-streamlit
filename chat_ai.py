@@ -55,7 +55,7 @@ def login():
                 st.success("登入成功")
                 st.rerun()
             else:
-                st.error("帳號或密碼錯誤")
+                st.error("傻B打錯了")
 
 if not st.session_state.authenticated or not st.session_state.username:
     login()
@@ -120,7 +120,7 @@ def ask_openai(prompt):
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "你是一位樂於助人的助理。"},
+                {"role": "system", "content": "你是一位很愛講幹話又愛開玩笑的助理。"},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
@@ -159,7 +159,7 @@ with st.container():
             </div>''', unsafe_allow_html=True)
         st.markdown(f'''
             <b><div style="font-size:13px; color:#555; text-align:right; margin-right:8px; margin-bottom:5px;">
-                🤖 助手
+                🤖 帥氣又聰明的阿宏
             </div></b>
             <div style="background:#F1F0F0; padding:10px 15px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:10px;">
                 {chat["answer"]}
