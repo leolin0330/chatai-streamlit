@@ -33,41 +33,65 @@ if "dark_mode" not in st.session_state:
 def toggle_theme():
     st.session_state.dark_mode = not st.session_state.dark_mode
 
-# 頁面最上方的主題切換按鈕
-st.button(
-    "🌗 切換深色/淺色模式",
-    on_click=toggle_theme
-)
+st.button("🌗 切換深色/淺色模式", on_click=toggle_theme)
 
-# 根據模式注入 CSS
+# 注入深淺色 CSS
 if st.session_state.dark_mode:
-    st.markdown("""
+    st.markdown(
+        """
         <style>
-        body, .css-18e3th9 {
+        .main {
             background-color: #121212 !important;
             color: #eee !important;
         }
-        .stTextInput>div>div>input {
+        .css-1d391kg {
+            background-color: #121212 !important;
+        }
+        .css-18e3th9, .stText, .stMarkdown {
+            color: #eee !important;
+        }
+        input, textarea {
             background-color: #333 !important;
             color: #eee !important;
         }
-        /* 你可以依需求擴充其他元件樣式 */
+        button, .stButton>button {
+            color: #eee !important;
+        }
+        a {
+            color: #3399ff !important;
+        }
         </style>
-    """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True,
+    )
 else:
-    st.markdown("""
+    st.markdown(
+        """
         <style>
-        body, .css-18e3th9 {
-            background-color: #fff !important;
-            color: #000 !important;
+        .main {
+            background-color: white !important;
+            color: black !important;
         }
-        .stTextInput>div>div>input {
-            background-color: #fff !important;
-            color: #000 !important;
+        .css-1d391kg {
+            background-color: white !important;
+        }
+        .css-18e3th9, .stText, .stMarkdown {
+            color: black !important;
+        }
+        input, textarea {
+            background-color: white !important;
+            color: black !important;
+        }
+        button, .stButton>button {
+            color: black !important;
+        }
+        a {
+            color: #0066cc !important;
         }
         </style>
-    """, unsafe_allow_html=True)
-
+        """,
+        unsafe_allow_html=True,
+    )
 # 初始化 session_state（登入前）
 for key, default in {
     "authenticated": False,
