@@ -53,7 +53,7 @@ def login():
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.success("登入成功")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("帳號或密碼錯誤")
 
@@ -72,7 +72,7 @@ if chat_key not in st.session_state:
 if st.button("登出"):
     st.session_state.authenticated = False
     st.session_state.username = None
-    st.experimental_rerun()
+    st.rerun()
     st.stop()
 
 
