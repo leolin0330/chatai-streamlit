@@ -10,7 +10,7 @@ from PIL import Image
 from openai import OpenAI
 from io import BytesIO
 import pandas as pd
-
+from pytesseract import pytesseract
 
 USAGE_FILE = "daily_usage.json"
 
@@ -204,6 +204,14 @@ if submitted:
                 file_text = df.to_string(index=False)
             except Exception as e:
                 st.error(f"❌ Excel 讀取失敗：{e}")
+                file_text = None
+        elif uploaded_file.name.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".tiff")):
+            # 讀取圖片並用 pytesseract 辨識
+            try:
+                image = Image.open(uploaded_file)
+                file_text = pytesseract.image_to_string(image, lang='eng+chi_tra')  # 如果你要中文，可以改成 'chi_tra' 需安裝中文字庫
+            except Exception as e:
+                st.error(f"❌ 讀取圖片 OCR 失敗：{e}")
                 file_text = None
 
         else:
