@@ -9,6 +9,7 @@ import base64
 from PIL import Image
 from openai import OpenAI
 from io import BytesIO
+import pandas as pd
 
 
 USAGE_FILE = "daily_usage.json"
@@ -165,7 +166,7 @@ with st.form("chat_form", clear_on_submit=True):
     cols = st.columns([6, 2])
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
-        uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=["txt", "pdf", "docx", "jpg", "jpeg", "png"])
+        uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=["txt", "pdf", "docx", "jpg", "jpeg", "png", "xls", "xlsx"])
 
     with cols[1]:
         submitted = st.form_submit_button("送出")
@@ -194,6 +195,16 @@ if submitted:
         elif uploaded_file.name.endswith(".docx"):
             doc = docx.Document(uploaded_file)
             file_text = "\n".join([para.text for para in doc.paragraphs])
+
+        elif uploaded_file.name.endswith((".xls", ".xlsx")):
+            # 讀 Excel
+            try:
+                df = pd.read_excel(uploaded_file)
+                # 把整個 Excel 內容轉成純文字，可以用 to_string()
+                file_text = df.to_string(index=False)
+            except Exception as e:
+                st.error(f"❌ Excel 讀取失敗：{e}")
+                file_text = None
 
         else:
             st.warning("❌ 不支援的檔案格式，目前僅支援 .txt、.pdf、.docx")
