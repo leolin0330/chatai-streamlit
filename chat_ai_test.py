@@ -85,6 +85,16 @@ if st.button("登出"):
 st.title("這是測試區")
 st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
 
+
+import shutil
+tess_path = shutil.which("tesseract")
+st.write(f"Tesseract 路徑: {tess_path}")
+
+if tess_path:
+    pytesseract.pytesseract.tesseract_cmd = tess_path
+else:
+    st.error("找不到 tesseract，可執行檔路徑！請確認伺服器是否已安裝 Tesseract OCR。")
+
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
 
@@ -175,6 +185,9 @@ with st.form("chat_form", clear_on_submit=True):
 clear_clicked = st.button("清除紀錄")
 
 # ==== 初始化記憶檔案內容用的 session_state ====
+import pytesseract
+from PIL import Image
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 if "uploaded_file_text" not in st.session_state:
     st.session_state.uploaded_file_text = None
     st.session_state.uploaded_file_name = None
