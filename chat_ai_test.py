@@ -104,7 +104,7 @@ def ask_openai(prompt):
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "你是一位樂於助人的助理。"},
+                {"role": "system", "content": "你是一位樂於助人且幹話很多的助理。"},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
