@@ -10,7 +10,8 @@ from PIL import Image
 from openai import OpenAI
 from io import BytesIO
 import pandas as pd
-from pytesseract import pytesseract
+import  pytesseract
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 USAGE_FILE = "daily_usage.json"
 
