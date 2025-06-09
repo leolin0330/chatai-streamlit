@@ -259,6 +259,9 @@ if st.session_state.confirm_clear:
         if st.button("✅ 是的，清除"):
             st.session_state[chat_key] = []
             st.session_state.confirm_clear = False
+            # 清除上傳檔案相關資訊
+            st.session_state.uploaded_file_text = None
+            st.session_state.uploaded_file_name = None
             st.rerun()
     with c2:
         if st.button("❌ 取消"):
