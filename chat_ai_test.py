@@ -11,6 +11,7 @@ from openai import OpenAI
 from io import BytesIO
 import pandas as pd
 import io
+import pytesseract
 
 
 USAGE_FILE = "daily_usage.json"
@@ -208,13 +209,18 @@ if submitted:
                 st.warning(f"❌ Excel 檔案讀取錯誤：{e}")
                 file_text = None
 
+
         elif uploaded_file.name.lower().endswith((".jpg", ".jpeg", ".png")):
             try:
                 image = Image.open(uploaded_file)
-                buffered = io.BytesIO()
-                image.save(buffered, format="PNG")
-                img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                file_text = f"[圖片 base64 編碼]\ndata:image/png;base64,{img_base64}\n\n請根據這張圖片內容回答以下問題："
+                text_from_image = pytesseract.image_to_string(image, lang='eng')  # 可加繁中 'chi_sim' 等
+                if not text_from_image.strip():
+                    st.warning("圖片中未偵測到文字，請確認圖片是否清晰。")
+
+                    file_text = None
+                else:
+
+                    file_text = f"[圖片文字辨識結果]\n{text_from_image}\n\n請根據這些文字回答以下問題："
             except Exception as e:
                 st.warning(f"❌ 圖片處理失敗：{e}")
                 file_text = None
