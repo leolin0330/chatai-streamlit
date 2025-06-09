@@ -104,7 +104,7 @@ def ask_openai(prompt):
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "你是一位樂於助人的助理。"},
+                {"role": "system", "content": "你是一位幹話很多且樂於助人的助理。"},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
@@ -245,7 +245,6 @@ with st.expander("📊 每日使用紀錄"):
 
 
  # streamlit run "C:\Users\timmy\PycharmProjects\PythonProject\LLM\ChatGPT_office_answer.py"
-# git add chat_ai_test.py
-# git commit -m "更新chat_ai_test.py功能"
-# git pull origin main
-# git push origin main
+git add chat_ai_test.py
+git commit -m "更新chat_ai_test.py功能"
+git push origin main
