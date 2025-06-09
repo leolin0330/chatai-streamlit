@@ -160,7 +160,8 @@ with st.form("chat_form", clear_on_submit=True):
     cols = st.columns([6, 2])
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
-        uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=["txt", "pdf", "docx"])
+        uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=["txt", "pdf", "docx", "jpg", "jpeg", "png"])
+
     with cols[1]:
         submitted = st.form_submit_button("送出")
 
