@@ -9,10 +9,6 @@ import base64
 from PIL import Image
 from openai import OpenAI
 from io import BytesIO
-import pandas as pd
-import io
-import pytesseract
-import easyocr
 
 
 USAGE_FILE = "daily_usage.json"
@@ -169,31 +165,25 @@ with st.form("chat_form", clear_on_submit=True):
     cols = st.columns([6, 2])
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
-        uploaded_file = st.file_uploader(
-            "📁 上傳檔案（支援 txt / pdf / docx / 圖片 / Excel）",
-            type=["txt", "pdf", "docx", "jpg", "jpeg", "png", "xlsx", "xls"]
-        )
+        uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=["txt", "pdf", "docx", "jpg", "jpeg", "png"])
 
     with cols[1]:
         submitted = st.form_submit_button("送出")
 
 clear_clicked = st.button("清除紀錄")
 
-# 初始化 session_state，用於儲存上傳檔案的文字內容和檔案名稱
+# ==== 初始化記憶檔案內容用的 session_state ====
 if "uploaded_file_text" not in st.session_state:
     st.session_state.uploaded_file_text = None
     st.session_state.uploaded_file_name = None
 
-# 初始化 OCR 讀取器
-reader = easyocr.Reader(['ch_sim', 'en'])  # 支援簡中和英文，依需求調整語言
-
 if submitted:
     full_prompt = user_input.strip()
 
+    # 如果有上傳新檔案，就重新解析並記下內容
     if uploaded_file:
         file_text = ""
 
-        # 判斷檔案格式並讀取內容
         if uploaded_file.name.endswith(".txt"):
             file_text = uploaded_file.read().decode("utf-8", errors="ignore")
 
@@ -205,42 +195,20 @@ if submitted:
             doc = docx.Document(uploaded_file)
             file_text = "\n".join([para.text for para in doc.paragraphs])
 
-        elif uploaded_file.name.endswith(".xlsx") or uploaded_file.name.endswith(".xls"):
-            try:
-                df = pd.read_excel(uploaded_file)
-                file_text = df.to_csv(index=False)
-            except Exception as e:
-                st.warning(f"❌ Excel 檔案讀取錯誤：{e}")
-                file_text = None
-
-        elif uploaded_file.name.lower().endswith((".jpg", ".jpeg", ".png")):
-            try:
-                image = Image.open(uploaded_file)
-                # 使用 pytesseract 讀取圖片文字（可改用 easyocr）
-                text_from_image = pytesseract.image_to_string(image, lang='eng')  # 或 'chi_sim+eng'
-                if not text_from_image.strip():
-                    st.warning("圖片中未偵測到文字，請確認圖片是否清晰。")
-                    file_text = None
-                else:
-                    file_text = f"[圖片文字辨識結果]\n{text_from_image}\n\n請根據這些文字回答以下問題："
-            except Exception as e:
-                st.warning(f"❌ 圖片處理失敗：{e}")
-                file_text = None
-
         else:
-            st.warning("❌ 不支援的檔案格式，目前僅支援 .txt、.pdf、.docx、.xlsx、.xls、.jpg、.jpeg、.png")
+            st.warning("❌ 不支援的檔案格式，目前僅支援 .txt、.pdf、.docx")
             file_text = None
 
-        # 如果成功讀取文字，存入 session_state
         if file_text:
+            # 記住檔案內容和名稱
             st.session_state.uploaded_file_text = file_text
             st.session_state.uploaded_file_name = uploaded_file.name
-            st.info("📖 檔案內容已成功讀取，現在可以根據這份文件或圖片問問題")
+            st.info("📖 檔案內容已成功讀取，現在可以根據這份文件問問題")
 
     # 判斷是要送出單純問題，還是附加檔案的 prompt
     if user_input:
         if st.session_state.uploaded_file_text:
-            prompt_with_file = f"{st.session_state.uploaded_file_text}\n\n問題：{user_input}"
+            prompt_with_file = f"以下是使用者的檔案內容：\n\n{st.session_state.uploaded_file_text}\n\n問題：{user_input}"
             question_desc = f"{user_input}\n（來自上傳檔案：{st.session_state.uploaded_file_name}）"
         else:
             prompt_with_file = user_input
@@ -281,10 +249,3 @@ with st.expander("📊 每日使用紀錄"):
     for date_str, cost in sorted(st.session_state.daily_usage.items()):
         st.write(f"{date_str}：${round(cost, 4)}")
 
-
-
- # streamlit run "C:\Users\timmy\PycharmProjects\PythonProject\LLM\ChatGPT_office_answer.py"
-# git add chat_ai_test.py
-# git commit -m "更新chat_ai_test.py功能"
-# git pull origin main
-# git push origin main
