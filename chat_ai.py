@@ -24,7 +24,7 @@ def save_daily_usage(data):
     except Exception as e:
         st.error(f"儲存使用紀錄失敗：{e}")
 
-st.set_page_config(page_title="問答助手", page_icon="💬")
+st.set_page_config(page_title="阿宏人見人愛", page_icon="😎")
 
 # 初始化 session_state（登入前）
 for key, default in {
@@ -55,7 +55,7 @@ def login():
                 st.success("登入成功")
                 st.rerun()
             else:
-                st.error("帳號或密碼錯誤")
+                st.error("傻B打錯了")
 
 if not st.session_state.authenticated or not st.session_state.username:
     login()
@@ -75,27 +75,44 @@ if st.button("登出"):
     st.rerun()
     st.stop()
 
-st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
+
+
+st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！我是阿宏我超帥😎!")
 
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
 
-DAILY_LIMITS = {
-    "ahong": None,
-    "abing": 0.05,
-    "user": 0.05,
-}
-user_limit = DAILY_LIMITS.get(username, 0.05)
+# --- 修改的身分與限額邏輯 ---
+if username == "ahong":
+    user_type = "admin"
+    user_limit = None
+elif username == "abing":
+    user_type = "special"
+    user_limit = 0.01
+else:
+    user_type = "user"
+    user_limit = 0.01
+
 today = str(date.today())
 today_used = st.session_state.daily_usage.get(today, 0.0)
 remaining = round(user_limit - today_used, 4) if user_limit is not None else None
 
-if username == "ahong":
-    st.info("🛠️ 你是管理員，無金額限制")
+# 顯示今日餘額
+if user_type == "admin":
+    st.markdown(
+        '<span style="font-size:10px;">🛠️ 你是管理員，無金額限制</span>',
+        unsafe_allow_html=True
+    )
 else:
-    st.warning(f"⚠️ 今日已使用：${round(today_used, 4)}，剩餘：${remaining} 美元")
+    st.markdown(
+        f'<span style="font-size:10px;">⚠️ 今日已使用：${round(today_used, 4)}，剩餘：${remaining} 美元</span>',
+        unsafe_allow_html=True
+    )
     if remaining is not None and remaining <= 0:
-        st.error("🚫 今日已達金額上限，請明天再來或聯絡管理員。")
+        st.markdown(
+            '<span style="font-size:10px;">🚫 今日已達金額上限，請明天再來或聯絡管理員。</span>',
+            unsafe_allow_html=True
+        )
         st.stop()
 
 def ask_openai(prompt):
@@ -103,7 +120,7 @@ def ask_openai(prompt):
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "你是一位樂於助人的助理。"},
+                {"role": "system", "content": "你是一位很愛講幹話又愛開玩笑的助理。"},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
@@ -116,6 +133,7 @@ def ask_openai(prompt):
         return answer, tokens_used, usd_cost, twd_cost
     except OpenAIError as e:
         return f"❌ API 錯誤：{str(e)}", 0, 0.0, 0.0
+
 
 st.markdown("""
 <style>
@@ -134,14 +152,14 @@ with st.container():
     for chat in st.session_state[chat_key]:
         st.markdown(f'''
             <div style="font-size:13px; color:#555; margin-left:8px; margin-bottom:3px;">
-                <b>{'👤 ASSHOLE BING' if username == 'abing' else '👤 使用者'}</b>
+                <b>{'👤 ASSHOLE BING' if username == 'abing' else f'👤 {username}'}</b>
             </div>
             <div style="background:#DCF8C6; padding:10px; border-radius:15px; max-width:75%; margin-bottom:10px;">
                 {chat["question"]}
             </div>''', unsafe_allow_html=True)
         st.markdown(f'''
             <b><div style="font-size:13px; color:#555; text-align:right; margin-right:8px; margin-bottom:5px;">
-                🤖 助手
+                🤖 帥氣又聰明的阿宏
             </div></b>
             <div style="background:#F1F0F0; padding:10px 15px; border-radius:15px; max-width:75%; margin-left:auto; margin-bottom:10px;">
                 {chat["answer"]}
@@ -161,6 +179,8 @@ with st.form("chat_form", clear_on_submit=True):
         user_input = st.text_input("💡 請輸入你的問題：")
         uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=["txt", "pdf", "docx"])
     with cols[1]:
+        # 增加垂直空間讓按鈕視覺靠下
+        st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
         submitted = st.form_submit_button("送出")
 
 # ========= 功能按鈕 =========
@@ -180,6 +200,7 @@ if clear_file_clicked:
     st.session_state.uploaded_file_text = None
     st.session_state.uploaded_file_name = None
     st.success("✅ 已清除上傳的檔案記憶")
+
 
 # ==== 處理送出 ====
 if submitted:
@@ -230,10 +251,6 @@ if submitted:
         st.session_state.daily_usage[today] = st.session_state.daily_usage.get(today, 0.0) + usd_cost
         st.rerun()
 
-
-
-
-
 # ========= 清除功能 =========
 if clear_clicked:
     st.session_state.confirm_clear = True
@@ -254,3 +271,9 @@ if st.session_state.confirm_clear:
 with st.expander("📊 每日使用紀錄"):
     for date_str, cost in sorted(st.session_state.daily_usage.items()):
         st.write(f"{date_str}：${round(cost, 4)}")
+
+
+# git add chat_ai.py — 把你本地改過的檔案都加入暫存區
+# git commit -m "描述你改了什麼" — 提交改動，做好版本紀錄
+# git pull origin main — 把遠端最新更新拉下來，合併到你本地（避免衝突）
+# git push origin main — 把本地最新版本推送回遠端 GitHub
