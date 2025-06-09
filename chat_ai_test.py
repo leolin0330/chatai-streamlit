@@ -86,14 +86,9 @@ st.title("這是測試區")
 st.success(f"歡迎 {'ASSHOLE BING 🙂' if username == 'abing' else username}！")
 
 
-import shutil
-tess_path = shutil.which("tesseract")
-st.write(f"Tesseract 路徑: {tess_path}")
 
-if tess_path:
-    pytesseract.pytesseract.tesseract_cmd = tess_path
-else:
-    st.error("找不到 tesseract，可執行檔路徑！請確認伺服器是否已安裝 Tesseract OCR。")
+st.write(f"c8 c8 8c c8 ")
+
 
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
