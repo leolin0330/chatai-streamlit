@@ -5,6 +5,13 @@ import json
 import os
 import docx
 import PyPDF2
+import base64
+from PIL import Image
+from openai import OpenAI
+from io import BytesIO
+import pandas as pd
+import io
+
 
 USAGE_FILE = "daily_usage.json"
 
@@ -160,7 +167,10 @@ with st.form("chat_form", clear_on_submit=True):
     cols = st.columns([6, 2])
     with cols[0]:
         user_input = st.text_input("💡 請輸入你的問題：")
-        uploaded_file = st.file_uploader("📁 上傳檔案（可選）", type=["txt", "pdf", "docx", "jpg", "jpeg", "png"])
+        uploaded_file = st.file_uploader(
+            "📁 上傳檔案（支援 txt / pdf / docx / 圖片 / Excel）",
+            type=["txt", "pdf", "docx", "jpg", "jpeg", "png", "xlsx", "xls"]
+        )
 
     with cols[1]:
         submitted = st.form_submit_button("送出")
@@ -190,20 +200,39 @@ if submitted:
             doc = docx.Document(uploaded_file)
             file_text = "\n".join([para.text for para in doc.paragraphs])
 
+        elif uploaded_file.name.endswith(".xlsx") or uploaded_file.name.endswith(".xls"):
+            try:
+                df = pd.read_excel(uploaded_file)
+                file_text = df.to_csv(index=False)
+            except Exception as e:
+                st.warning(f"❌ Excel 檔案讀取錯誤：{e}")
+                file_text = None
+
+        elif uploaded_file.name.lower().endswith((".jpg", ".jpeg", ".png")):
+            try:
+                image = Image.open(uploaded_file)
+                buffered = io.BytesIO()
+                image.save(buffered, format="PNG")
+                img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+                file_text = f"[圖片 base64 編碼]\ndata:image/png;base64,{img_base64}\n\n請根據這張圖片內容回答以下問題："
+            except Exception as e:
+                st.warning(f"❌ 圖片處理失敗：{e}")
+                file_text = None
+
         else:
-            st.warning("❌ 不支援的檔案格式，目前僅支援 .txt、.pdf、.docx")
+            st.warning("❌ 不支援的檔案格式，目前僅支援 .txt、.pdf、.docx、.xlsx、.xls、.jpg、.jpeg、.png")
             file_text = None
 
         if file_text:
             # 記住檔案內容和名稱
             st.session_state.uploaded_file_text = file_text
             st.session_state.uploaded_file_name = uploaded_file.name
-            st.info("📖 檔案內容已成功讀取，現在可以根據這份文件問問題")
+            st.info("📖 檔案內容已成功讀取，現在可以根據這份文件或圖片問問題")
 
     # 判斷是要送出單純問題，還是附加檔案的 prompt
     if user_input:
         if st.session_state.uploaded_file_text:
-            prompt_with_file = f"以下是使用者的檔案內容：\n\n{st.session_state.uploaded_file_text}\n\n問題：{user_input}"
+            prompt_with_file = f"{st.session_state.uploaded_file_text}\n\n問題：{user_input}"
             question_desc = f"{user_input}\n（來自上傳檔案：{st.session_state.uploaded_file_name}）"
         else:
             prompt_with_file = user_input
