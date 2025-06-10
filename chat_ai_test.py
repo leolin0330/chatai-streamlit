@@ -172,7 +172,7 @@ with st.form("chat_form", clear_on_submit=True):
     with cols[1]:
         submitted = st.form_submit_button("送出")
 
-clear_clicked = st.button("清除紀錄...")
+clear_clicked = st.button("清除紀錄")
 
 # ==== 初始化記憶檔案內容用的 session_state ====
 import pytesseract
