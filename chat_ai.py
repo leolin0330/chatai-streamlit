@@ -256,7 +256,7 @@ if clear_clicked:
     st.session_state.confirm_clear = True
 
 if st.session_state.confirm_clear:
-    st.warning("⚠️ 你確定要清除所有對話紀錄嗎？這個動作無法還原！")
+    st.warning("⚠️ 你確定要清除所有對話紀錄嗎？這個動作無法還原！!")
     c1, c2 = st.columns(2)
     with c1:
         if st.button("✅ 是的，清除"):

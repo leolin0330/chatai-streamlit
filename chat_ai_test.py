@@ -103,7 +103,7 @@ if username == "ahong":
 else:
     st.warning(f"⚠️ 今日已使用：${round(today_used, 4)}，剩餘：${remaining} 美元")
     if remaining is not None and remaining <= 0:
-        st.error("🚫 今日已達金額上限，請明天再來或聯絡管理員。")
+        st.error("🚫 今日已達金額上限，請明天再來或聯絡管理員!。")
         st.stop()
 
 def ask_openai(prompt):
